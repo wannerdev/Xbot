@@ -1,0 +1,2 @@
+# Xbot
+AI for boardgame
