@@ -20,30 +20,33 @@ public class client {
 			Integer num = (int) (Math.random()*10);
 	        NetworkClient client = new NetworkClient(null, "XBot"+num.toString()+"000", logo);
 	    	
-	        client.getMyPlayerNumber();        
-	        client.getTimeLimitInSeconds();        
-	        client.getExpectedNetworkLatencyInMilliseconds();
+	        //client.getMyPlayerNumber();        
+	        //client.getTimeLimitInSeconds();        
+	        //client.getExpectedNetworkLatencyInMilliseconds();
 	        
         	while(true) {
 	            Move move = client.receiveMove(); //Man bekommt auch den eigenen Zug
 	            if (move == null) {
 	                //ich bin dran
-	            	if(client.getMyPlayerNumber() == 1) {
-
-		                client.sendMove(new Move(client.getMyPlayerNumber(), 1, 6));
+	            	int x=0, y=0;
+	            	Move lastmove = new Move(client.getMyPlayerNumber(), x,y);
+	            	switch( client.getMyPlayerNumber()){
+	            		case 1:
+			                client.sendMove(KoordHelper.rotate(1,lastmove));
+			                break;
+		            	case 2:
+			                client.sendMove(KoordHelper.rotate(2,lastmove));
+			                break;
+		            	case 3:
+			                client.sendMove(KoordHelper.rotate(3,lastmove));
+			                break;
+		            	case 0: 
+		            		client.sendMove(lastmove);
+		            		break;
 	            	}
-	            	if(client.getMyPlayerNumber() == 2) {
-
-		                client.sendMove(new Move(client.getMyPlayerNumber(), 6, 6));
-	            	}
-	            	if(client.getMyPlayerNumber() == 3) {
-
-		                client.sendMove(new Move(client.getMyPlayerNumber(), 6, 1));
-	            	}
-	                client.sendMove(new Move(client.getMyPlayerNumber(),1, 1));
-	            } else {
 	                //baue Zug in meine spielfeldrepräsentation ein
-	            }
+	            	}
+	            
         	}
     	}catch(Exception e) {
 	    		System.out.println(e.getLocalizedMessage());
