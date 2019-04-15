@@ -9,7 +9,7 @@ import javax.imageio.ImageIO;
 import lenz.htw.sawhian.Move;
 import lenz.htw.sawhian.net.*;
 
-public class client {
+public class Client {
 
 	//Man bekommt nur die position des steines nicht das Ziel da der Stein ja nur in eine Richtung kann
 	public static void main (String[] args) {		
@@ -19,16 +19,12 @@ public class client {
 			BufferedImage logo = ImageIO.read(new File("res/"+logoh+".png"));
 			Integer num = (int) (Math.random()*10);
 	        NetworkClient client = new NetworkClient(null, "XBot"+num.toString()+"000", logo);
-	    	
-	        //client.getMyPlayerNumber();        
-	        //client.getTimeLimitInSeconds();        
-	        //client.getExpectedNetworkLatencyInMilliseconds();
-	        
+
+        	int x=0, y=0;
         	while(true) {
 	            Move move = client.receiveMove(); //Man bekommt auch den eigenen Zug
 	            if (move == null) {
 	                //ich bin dran
-	            	int x=0, y=0;
 	            	Move lastmove = new Move(client.getMyPlayerNumber(), x,y);
 	            	switch( client.getMyPlayerNumber()){
 	            		case 1:
@@ -45,8 +41,9 @@ public class client {
 		            		break;
 	            	}
 	                //baue Zug in meine spielfeldrepräsentation ein
-	            	}
-	            
+	            	if(x == 6)x=0;
+	            	x++;
+	            }
         	}
     	}catch(Exception e) {
 	    		System.out.println(e.getLocalizedMessage());

@@ -1,8 +1,12 @@
 package Xbot;
 
+import Xbot.Board.Config;
+
 public class Stone {
 
 	byte x,y;
+	byte player;
+	
 	boolean isBlocked(){
 		//if two stones ahead
 		return true;
@@ -13,7 +17,7 @@ public class Stone {
 	 * @param stone
 	 * @return return negative if blocked after jump
 	 */
-	byte canJump(Stone stone) {
+	byte canJump(Config config) {
 		//hasone ahead and space
 		//hastwo ahead and two space
 		//hasthree ahead and three space
@@ -21,9 +25,8 @@ public class Stone {
 	}
 	
 	byte distanceToGoal(){
-		return this.x; //spieler 0
-	}
-	boolean checkIfMoveValid() {
-		return false;
+		//decision needed absolut or relative coords
+		//switch()
+		return (byte) ((byte)7-this.y); 
 	}
 }
