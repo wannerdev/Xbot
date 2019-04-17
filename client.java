@@ -29,27 +29,15 @@ public class Client {
 	            if (move == null) {
 	                //ich bin dran
 	            	Move lastmove = new Move(client.getMyPlayerNumber(), x,y);
-	            	/*switch( client.getMyPlayerNumber()){
-	            		case 1:
-			                client.sendMove(KoordHelper.rotate((byte)1,lastmove));
-			                break;
-		            	case 2:
-			                client.sendMove(KoordHelper.rotate((byte)2,lastmove));
-			                break;
-		            	case 3:
-			                client.sendMove(KoordHelper.rotate((byte)3,lastmove));
-			                break;
-		            	case 0: 
-		            		client.sendMove(lastmove);
-		            		break;
-	            	}*/
 	            	if(myNumber ==0) {
-	            		if(Board.isValidMove(lastmove, b ))
-	            		client.sendMove(lastmove);
+	            		if(Board.isValidMove(lastmove, b )) {
+	            			client.sendMove(lastmove);
+	            		}
 	            	}else {
 		                client.sendMove(KoordHelper.rotate((byte)myNumber, lastmove));
 	            	}
 	                //baue Zug in meine spielfeldrepräsentation ein
+	            	
 	            	if(x == 6)x=0;
 	            	x++;
 	            }

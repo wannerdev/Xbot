@@ -56,9 +56,31 @@ public class Board {
     		
     		}
     	}
-    	//If first row, 
-    	if(y == 0) {
-    		return true;
+    	switch(m.player) {
+	    	case 0:
+	    		if(y == 0) {
+		    		return true;
+		    	}
+	    		break;
+	    	case 1:
+	    		if(x == 0) {
+	    		return true;
+	    	}
+	    		break;
+	    	case 2:
+	    		if(y == 6) {
+	    			return true;
+	    		}
+	    		break;
+	    	case 3:
+	    		if(x == 6) {
+	    			return true;
+	    		}
+	    		break;
+    	}
+    	if(m.player == 0) { 
+	    	//If first row, 
+	    	
     	}
     	return false;
     	
