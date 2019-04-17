@@ -11,6 +11,8 @@ import lenz.htw.sawhian.net.*;
 
 public class Client {
 
+	//java -Djava.library.path=C:\Users\Johannes\Dropbox\Java\sawhian\lib\native -jar C:\Users\Johannes\Dropbox\Java\sawhian\sawhian.jar 4 1600 900
+	//Laptop auflösung server
 	//Man bekommt nur die position des steines nicht das Ziel da der Stein ja nur in eine Richtung kann
 	public static void main (String[] args) {		
 		try {
@@ -19,26 +21,33 @@ public class Client {
 			BufferedImage logo = ImageIO.read(new File("res/"+logoh+".png"));
 			Integer num = (int) (Math.random()*10);
 	        NetworkClient client = new NetworkClient(null, "XBot"+num.toString()+"000", logo);
-
+	        int myNumber = client.getMyPlayerNumber();
         	int x=0, y=0;
+        	Board b = new Board();
         	while(true) {
 	            Move move = client.receiveMove(); //Man bekommt auch den eigenen Zug
 	            if (move == null) {
 	                //ich bin dran
 	            	Move lastmove = new Move(client.getMyPlayerNumber(), x,y);
-	            	switch( client.getMyPlayerNumber()){
+	            	/*switch( client.getMyPlayerNumber()){
 	            		case 1:
-			                client.sendMove(KoordHelper.rotate(1,lastmove));
+			                client.sendMove(KoordHelper.rotate((byte)1,lastmove));
 			                break;
 		            	case 2:
-			                client.sendMove(KoordHelper.rotate(2,lastmove));
+			                client.sendMove(KoordHelper.rotate((byte)2,lastmove));
 			                break;
 		            	case 3:
-			                client.sendMove(KoordHelper.rotate(3,lastmove));
+			                client.sendMove(KoordHelper.rotate((byte)3,lastmove));
 			                break;
 		            	case 0: 
 		            		client.sendMove(lastmove);
 		            		break;
+	            	}*/
+	            	if(myNumber ==0) {
+	            		if(Board.isValidMove(lastmove, b ))
+	            		client.sendMove(lastmove);
+	            	}else {
+		                client.sendMove(KoordHelper.rotate((byte)myNumber, lastmove));
 	            	}
 	                //baue Zug in meine spielfeldrepräsentation ein
 	            	if(x == 6)x=0;

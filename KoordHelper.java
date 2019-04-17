@@ -4,9 +4,9 @@ import lenz.htw.sawhian.Move;
 
 public class KoordHelper {
 
-	public static Move rotate(int amount, Move move) {
+	public static Move rotate(byte player, Move move) {
 		//System.out.println("Before turn"+amount+" X:"+move.x +" y:"+ move.y);
-		for(int i=0; i< amount; i++) {
+		for(int i=0; i< player; i++) {
 			int y = move.y;
 			int x = (move.x-6)*-1;
 			move.x = y;
