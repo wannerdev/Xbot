@@ -18,7 +18,7 @@ public class Client {
 		try {
 			
 			String logoh ="cybran";			
-			BufferedImage logo = ImageIO.read(new File("res/"+logoh+".png"));
+			BufferedImage logo = ImageIO.read(new File("src/xbot/"+logoh+".png"));
 			Integer num = (int) (Math.random()*10);
 	        NetworkClient client = new NetworkClient(null, "XBot"+num.toString()+"000", logo);
 	        int myNumber = client.getMyPlayerNumber();
@@ -30,15 +30,15 @@ public class Client {
 	                //ich bin dran
 	            	Move lastmove = new Move(client.getMyPlayerNumber(), x,y);
 	            	if(myNumber ==0) {
-	            		if(Board.isValidMove(lastmove, b )) {
+	            		//if(Board.isValidMove(lastmove, b )) {
 	            			client.sendMove(lastmove);
-	            		}
+	            		//}
 	            	}else {
 		                client.sendMove(KoordHelper.rotate((byte)myNumber, lastmove));
 	            	}
 	                //baue Zug in meine spielfeldrepräsentation ein
-	            	
-	            	if(x == 6)x=0;
+	            	b.addMoveToBoard(lastmove);
+	            	if(x == 5)x=0;
 	            	x++;
 	            }
         	}

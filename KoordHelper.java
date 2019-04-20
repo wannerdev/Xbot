@@ -15,4 +15,19 @@ public class KoordHelper {
 		//System.out.println("After X:"+move.x +" y:"+ move.y);
 		return move;
 	}
+	
+	public static Move playertoDir(byte player) {
+		assert player <=3 && player > -1;
+		switch(player) {
+	    	case 0:
+		    	return new Move(0,1,player);
+	    	case 1:
+	    		return new Move(1,0,player);
+	    	case 2:
+	    		return new Move(0,-1,player);
+	    	case 3:
+	    		return new Move(-1,0,player);
+		}
+		return null;
+	}
 }

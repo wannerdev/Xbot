@@ -4,10 +4,16 @@ import Xbot.Board.Config;
 
 public class Stone {
 
-	byte x,y;
-	byte player;
+	byte x, y, player;
 	
-	boolean isBlocked(){
+	Stone(byte x, byte y, byte player){
+		this.x = x;
+		this.y = y;
+		this.player = player;
+	}
+	
+	boolean isBlocked(Config conf) {
+		//this
 		//if two stones ahead
 		return true;
 	}
