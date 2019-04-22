@@ -1,9 +1,11 @@
 package Xbot;
 
 import Xbot.Board.Config;
+import lenz.htw.sawhian.Move;
 
 public class Stone {
 
+	//Coords absolute, decided 22.04
 	byte x, y, player;
 	
 	Stone(byte x, byte y, byte player){
@@ -11,11 +13,14 @@ public class Stone {
 		this.y = y;
 		this.player = player;
 	}
-	
-	boolean isBlocked(Config conf) {
-		//this
-		//if two stones ahead
-		return true;
+	/**
+	 * if two stones ahead	
+	 * @param bo
+	 * @return
+	 */
+	boolean isBlocked(Board bo) {		
+		Move dir = KoordHelper.playerToDirection(player);
+		return (bo.getStoneAtKoord((byte)(x+dir.x),(byte)(y+dir.y)) != null) && (bo.getStoneAtKoord((byte)(x+dir.x), (byte)(y+dir.y)) != null);
 	}
 	
 	/**
@@ -31,8 +36,14 @@ public class Stone {
 	}
 	
 	byte distanceToGoal(){
-		//decision needed absolut or relative coords
 		//switch()
-		return (byte) ((byte)7-this.y); 
+		Move dir = KoordHelper.playerToDirection(player);
+		if(dir.x !=0) {
+			return (byte) ((byte)7-this.x); 	
+		}
+		if(dir.y !=0) {
+			return (byte) ((byte)7-this.y);			
+		}
+		return 7;
 	}
 }

@@ -35,8 +35,7 @@ public class Board {
     }
 	
 	/**
-	 * Koords atm relative
-	 * TBD relative absolute
+	 * 
 	 * @param x
 	 * @param y
 	 * @param player
@@ -55,11 +54,11 @@ public class Board {
 	    			//TODO and has space ahead or Jumping, In Stone ?
 	    			if(stone.player == m.player ) {
 	    				//Move iffree =  new Move(m.x,m.y,m.player);
-	    				m.x += KoordHelper.playertoDir((byte)m.player).x;
-	    				m.y += KoordHelper.playertoDir((byte)m.player).y;
-	    				//if (!stone.isBlocked()) {
-	    				//	return true;
-	    				//}
+	    				m.x += KoordHelper.playerToDirection((byte)m.player).x;
+	    				m.y += KoordHelper.playerToDirection((byte)m.player).y;
+	    				if (!stone.isBlocked(board)) {
+	    					return true;
+	    				}
 	    				return true;//for the moment
 		    		}else {
 		    			//can't move someone elses stone
@@ -94,39 +93,44 @@ public class Board {
 		}
     	return false;    	
     }
-    
-    boolean addMoveToBoard(Move move) {
+    /**
+     * Integrate Moves into our config
+     * @param move
+     * @return
+     */
+    public boolean addMoveToBoard(Move move) {
     	//if stack full add stone
-    	if(stateConfig.stackSto[move.player]==7) {
+    	if(stateConfig.stackSto[move.player] == 7) {
     		stateConfig.stones[stateConfig.ptr] = new Stone((byte)move.x, (byte)move.y, (byte)move.player);
     		stateConfig.ptr++;
         	return true;
     	}
     	//if stone there
     	
-    	Move direction = KoordHelper.playertoDir((byte)move.player);
+    	Move direction = KoordHelper.playerToDirection((byte)move.player);
     	//stateConfig.stones
     	return false;
     }
     /**
-     * 
+     * Get potential stone 
      * @param x
      * @param y
-     * @returns index of requested stone
+     * @returns requested Stone or Null
      */
-    int getStoneAtKoord(byte x, byte y) {
+    public Stone getStoneAtKoord(byte x, byte y) {
     	assert x >= 0 && y >= 0;
     	for(int i=0; i< stateConfig.ptr; i++) {
     		if(stateConfig.stones[i].x == x && stateConfig.stones[i].y == y){
-    			return i;
+    			return stateConfig.stones[i];
     		}
     	}
-		return -1;
+		return null;
     }
     
-    static boolean spotIsFree(int x, int y, Board board) {
+    public static boolean spotIsFree(int x, int y, Board board) {
     	for (Stone stone: board.stateConfig.stones) {
     		if(x == stone.x && y == stone.y) {
+    			//if stone at position
     			return false;
     		}
     	}
