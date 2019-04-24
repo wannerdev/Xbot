@@ -44,8 +44,7 @@ public class client {
 		                client.sendMove(lastmove);
 	            	}
 
-	            	if(x == 5)x=0; ///6-0 is ja 0-0 von jmd anderes
-	            	x++;
+	            	b.moveStone(lastmove.x,lastmove.y,myNumber,0,b);
 	            }else {
 	                //baue Zug in meine spielfeldrepräsentation ein
 	            	b.moveStone(move.x,move.y,myNumber,0,b);

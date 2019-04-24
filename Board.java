@@ -73,8 +73,8 @@ public class Board {
 		//System.out.println(myPossibleMoves.size());
 		if (myPossibleMoves.size() > 0) {
 
-		//	int moveIndex = (int) (Math.random() * myPossibleMoves.size());
-			Move myMove = myPossibleMoves.get(0);
+		    int moveIndex = (int) (Math.random() * myPossibleMoves.size());
+			Move myMove = myPossibleMoves.get(moveIndex);
 			return myMove;
 
 		} else {
@@ -103,15 +103,8 @@ public class Board {
 			} else if (st.inStack) {
 				// falls er im Stack ist, perform set up je nachdem welcher spieler dran ist
 				Vector2 vec = new Vector2 (0,0);
-				try {
 				vec = new Vector2(7-board.stateConfig.stackSto[player], 0);
-				if(vec.x <0|| vec.x >6 || vec.y >0) {
-					throw new Exception("wtf"+ " ||"+vec.x +" ||"+vec.y );
-				}
-				}catch(Exception e) {
-					System.out.println(e.getLocalizedMessage());
-				}
-				// f�ge den Zug hinzu
+			
 
 				Move move = new Move(player, vec.x, vec.y);
 				if (spotIsFree(move.x,move.y, board)) {
