@@ -26,30 +26,27 @@ public class Client {
         	Board b = new Board();
         	while(true) {
 	            Move move = client.receiveMove(); //Man bekommt auch den eigenen Zug
+	        	Move lastmove = new Move(client.getMyPlayerNumber(), x,y);
+                //ich bin dran
 	            if (move == null) {
-	                //ich bin dran
-	            	Move lastmove = new Move(client.getMyPlayerNumber(), x,y);
 	            	if(myNumber ==0) {
 	            		//if(Board.isValidMove(lastmove, b )) {
 	            			client.sendMove(lastmove);
+	            			
 	            		//}
 	            	}else {
 	            		// ansonsten rotiere das spielbrett f�r den entsprechenden Spieler       		
-	            		myMove = KoordHelper.rotate((byte)myNumber, myMove);
-		                client.sendMove(myMove);
+	            		lastmove = KoordHelper.rotate((byte)myNumber, lastmove);
+		                client.sendMove(lastmove);
 	            	}
-	            
-	                b.makeMove(x, y, myNumber, 1);
-	              
+
+	            	if(x == 5)x=0; ///6-0 is ja 0-0 von jmd anderes
+	            	x++;
 	            }else {
 	                //baue Zug in meine spielfeldrepräsentation ein
-	            	b.addMoveToBoard(lastmove);
-	            	if(x == 5)x=0;
-	            	x++;
+	            	b.addMoveToBoard(move);
 	            }
-	       
-            	if(x == 6)x=0;
-            	//x++;
+
         	}
     	}catch(Exception e) {
 	    		System.out.println(e.getLocalizedMessage());
