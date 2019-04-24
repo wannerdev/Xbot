@@ -6,11 +6,19 @@ public class Stone {
 
 	byte x,y;
 	byte player;
-	
+    byte indexer;
+    	
 	boolean isBlocked(){
 		//if two stones ahead
 		return true;
 	}
+	
+	public boolean inStack = true;
+		
+		
+		
+		
+	
 	
 	/**
 	 * 

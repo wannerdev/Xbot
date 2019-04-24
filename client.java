@@ -17,7 +17,7 @@ public class Client {
 	public static void main (String[] args) {		
 		try {
 			
-			String logoh ="cybran";			
+			String logoh ="logo";			
 			BufferedImage logo = ImageIO.read(new File("res/"+logoh+".png"));
 			Integer num = (int) (Math.random()*10);
 	        NetworkClient client = new NetworkClient(null, "XBot"+num.toString()+"000", logo);
@@ -28,31 +28,29 @@ public class Client {
 	            Move move = client.receiveMove(); //Man bekommt auch den eigenen Zug
 	            if (move == null) {
 	                //ich bin dran
-	            	Move lastmove = new Move(client.getMyPlayerNumber(), x,y);
-	            	/*switch( client.getMyPlayerNumber()){
-	            		case 1:
-			                client.sendMove(KoordHelper.rotate((byte)1,lastmove));
-			                break;
-		            	case 2:
-			                client.sendMove(KoordHelper.rotate((byte)2,lastmove));
-			                break;
-		            	case 3:
-			                client.sendMove(KoordHelper.rotate((byte)3,lastmove));
-			                break;
-		            	case 0: 
-		            		client.sendMove(lastmove);
-		            		break;
-	            	}*/
+	            	Move myMove = new Move(client.getMyPlayerNumber(), x,y);
+	            	
 	            	if(myNumber ==0) {
-	            		if(Board.isValidMove(lastmove, b ))
-	            		client.sendMove(lastmove);
+	            		
+	            		// wenn ich spieler eins bin
+	            		if(Board.isValidMove(myMove, b ))
+	            		client.sendMove(myMove);
 	            	}else {
-		                client.sendMove(KoordHelper.rotate((byte)myNumber, lastmove));
+	            		// ansonsten rotiere das spielbrett für den entsprechenden Spieler       		
+	            		myMove = KoordHelper.rotate((byte)myNumber, myMove);
+		                client.sendMove(myMove);
 	            	}
+	            
+	                b.makeMove(x, y, myNumber, 1);
+	              
+	            }else {
 	                //baue Zug in meine spielfeldreprÃ¤sentation ein
-	            	if(x == 6)x=0;
-	            	x++;
+	                b.makeMove(x, y, myNumber,1);
+	            	
 	            }
+	       
+            	if(x == 6)x=0;
+            	//x++;
         	}
     	}catch(Exception e) {
 	    		System.out.println(e.getLocalizedMessage());
