@@ -9,7 +9,7 @@ import javax.imageio.ImageIO;
 import lenz.htw.sawhian.Move;
 import lenz.htw.sawhian.net.*;
 
-public class Client {
+public class client {
 
 	//java -Djava.library.path=C:\Users\Johannes\Dropbox\Java\sawhian\lib\native -jar C:\Users\Johannes\Dropbox\Java\sawhian\sawhian.jar 4 1600 900
 	//Laptop auflösung server
@@ -19,14 +19,17 @@ public class Client {
 			
 			String logoh ="cybran";			
 			BufferedImage logo = ImageIO.read(new File("src/xbot/"+logoh+".png"));
-			Integer num = (int) (Math.random()*10);
+			Integer num = (int) (Math.random()*50);
 	        NetworkClient client = new NetworkClient(null, "XBot"+num.toString()+"000", logo);
 	        int myNumber = client.getMyPlayerNumber();
+	        System.out.println(myNumber);
         	int x=0, y=0;
         	Board b = new Board();
+        	
+        	b.init();
         	while(true) {
 	            Move move = client.receiveMove(); //Man bekommt auch den eigenen Zug
-	        	Move lastmove = new Move(client.getMyPlayerNumber(), x,y);
+	        	Move lastmove =  Board.bestMove(myNumber, b);//new Move(client.getMyPlayerNumber(), x,y);
                 //ich bin dran
 	            if (move == null) {
 	            	if(myNumber ==0) {
