@@ -48,7 +48,7 @@ public class Board {
 
 		
 		for (int i = 0; i < stateConfig.stones.length; i++) {
-			stateConfig.stones[i] = new Stone ((byte)0,(byte)0,(byte)0);
+			stateConfig.stones[i] = new Stone ((byte)-1,(byte)-1,(byte)0);
 			stateConfig.stones[i].inStack = true;
 			if (i < 7) {
 				stateConfig.stones[i].player = 0;
@@ -74,7 +74,7 @@ public class Board {
 		if (myPossibleMoves.size() > 0) {
 
 		//	int moveIndex = (int) (Math.random() * myPossibleMoves.size());
-			Move myMove = myPossibleMoves.get(moveIndex);
+			Move myMove = myPossibleMoves.get(0);
 			return myMove;
 
 		} else {
@@ -90,7 +90,7 @@ public class Board {
 	public static List<Move> calcFreeMoves(int player, Board board) {
 		// Evtl ein Set nehmen?
 		List<Move> result = new ArrayList<Move>();
-		List<Stone> myStones = getMyStones(player, board);
+		Stone[] myStones = getMyStones(player, board);
 		for (Stone st : myStones) {
 			/// pr�fe ob der Stein im Stack ist
 			if (!st.inStack) {
@@ -104,7 +104,7 @@ public class Board {
 				// falls er im Stack ist, perform set up je nachdem welcher spieler dran ist
 				Vector2 vec = new Vector2 (0,0);
 				try {
-				vec = new Vector2(myStones.indexOf(st), 0);
+				vec = new Vector2(7-board.stateConfig.stackSto[player], 0);
 				if(vec.x <0|| vec.x >6 || vec.y >0) {
 					throw new Exception("wtf"+ " ||"+vec.x +" ||"+vec.y );
 				}
@@ -195,7 +195,7 @@ public class Board {
 	 * Hier wird ein Zug gemacht auf dem SpielBrett. Jenachdem welcher Spieler und
 	 * wie viele Steine gesprungen werden sollen ver�dnert sich der Bewegungs Vektor
 	 */
-	void moveStone(int x, int y, int playerNumber, int howManyFields, Board board) {
+	public void moveStone(int x, int y, int playerNumber, int howManyFields, Board board) {
 
 		// bestimme den RichtungsVektor f�r den aktuellen Zug
 		Vector2 moveDir = new Vector2(0, 0);
@@ -225,7 +225,6 @@ public class Board {
 				if (x == st.x) {
 					if (y == st.y) {
 						// wenn wir den richtigen Stein haben, mach den Zug mit dem Stein
-
 						st.x += moveDir.x;
 						st.y += moveDir.y;
 						break;
@@ -235,14 +234,15 @@ public class Board {
 
 		} else {
 
-			List<Stone> myStones = getMyStones(playerNumber, board);
+			for (Stone st : board.stateConfig.stones) {
 
-			for (Stone st : myStones) {
-
-				if (st.inStack) {
+				if (st.inStack && st.player == playerNumber) {
 
 					st.x = (byte) x;
 					st.y = (byte) y;
+					st.inStack = false;
+					board.stateConfig.stackSto[playerNumber]--;
+					return;
 				}
 			}
 		}
@@ -263,13 +263,15 @@ public class Board {
 		}
 	}
 
-	public static List<Stone> getMyStones(int player, Board board) {
-		List<Stone> myStones = new ArrayList<Stone>();
+	public static Stone[] getMyStones(int player, Board board) {
+		Stone myStones[] = new Stone[7];
+		int indexer= 0;
 		// finde meine Steine
-		for (Stone st : board.stateConfig.stones) {
+		for (int i = 0; i < board.stateConfig.stones.length;i++) {
 
-			if (st.player == player) {
-				myStones.add(st);
+			if (board.stateConfig.stones[i].player == player) {
+				myStones[indexer] = board.stateConfig.stones[i];
+				indexer++;
 			}
 
 		}

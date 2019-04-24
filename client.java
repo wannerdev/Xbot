@@ -23,10 +23,11 @@ public class client {
 	        NetworkClient client = new NetworkClient(null, "XBot"+num.toString()+"000", logo);
 	        int myNumber = client.getMyPlayerNumber();
 	        System.out.println(myNumber);
-        	int x=0, y=0;
+        
         	Board b = new Board();
         	
         	b.init();
+        	int x=0, y=0;
         	while(true) {
 	            Move move = client.receiveMove(); //Man bekommt auch den eigenen Zug
 	        	Move lastmove =  Board.bestMove(myNumber, b);//new Move(client.getMyPlayerNumber(), x,y);
@@ -47,7 +48,7 @@ public class client {
 	            	x++;
 	            }else {
 	                //baue Zug in meine spielfeldrepräsentation ein
-	            	b.addMoveToBoard(move);
+	            	b.moveStone(move.x,move.y,myNumber,0,b);
 	            }
 
         	}
