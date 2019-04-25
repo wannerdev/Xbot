@@ -6,7 +6,6 @@ import java.util.List;
 import lenz.htw.sawhian.Move;
 
 public class Board {
-	// final int DIMENSION = 7; //needed?
 	Config stateConfig;
 
 	class Config {
@@ -15,44 +14,17 @@ public class Board {
 		byte ptr = 0; // basically a counter how many stones on board.
 	}
 
-	Board() {
-		stateConfig = new Config();
-	}
-
-	static class Vector2 {
-
-		int x;
-		int y;
-
-		public Vector2(int x, int y) {
-
-			this.x = x;
-			this.y = y;
-
-		}
-
-	}
-
-	/*
-	 * TODO: STONE SET UP RICHTIG MACHEN UND HERAUS FINDEN WIE DIE MOVES
-	 * FUNKTIONIEREN!!!
-	 * 
-	 * 
-	 */
-
 	// set up the stones and assign them a player number
-	public void init() {
+	public Board() {
 		stateConfig = new Config();
 		stateConfig.stones = new Stone[28];
-		
-
 		
 		for (int i = 0; i < stateConfig.stones.length; i++) {
 			stateConfig.stones[i] = new Stone ((byte)-1,(byte)-1,(byte)0);
 			stateConfig.stones[i].inStack = true;
 			if (i < 7) {
 				stateConfig.stones[i].player = 0;
-
+				
 			} else if (i >= 7 && i < 14) {
 				stateConfig.stones[i].player = 1;
 
@@ -61,38 +33,16 @@ public class Board {
 
 			} else if (i >= 21 && i < 28) {
 				stateConfig.stones[i].player = 3;
-
 			}
 		}
-
 	}
 
-	public static Move bestMove(int playerNumber, Board b) {
-
-		List<Move> myPossibleMoves = calcFreeMoves(playerNumber, b);
-		//System.out.println(myPossibleMoves.size());
-		if (myPossibleMoves.size() > 0) {
-
-		    int moveIndex = (int) (Math.random() * myPossibleMoves.size());
-			Move myMove = myPossibleMoves.get(moveIndex);
-			return myMove;
-
-		} else {
-			return null;
-		}
-
-	}
-
-	/*
-	 * TODO: STONE SET UP RICHTIG MACHEN UND HERAUS FINDEN WIE DIE MOVES
-	 * FUNKTIONIEREN!!!
-	 */
-	public static List<Move> calcFreeMoves(int player, Board board) {
+	public List<Move> calcFreeMoves(int player, Config conf) throws Exception {
 		// Evtl ein Set nehmen?
 		List<Move> result = new ArrayList<Move>();
-		Stone[] myStones = getMyStones(player, board);
+		Stone[] myStones = this.getMyStones(player, conf);
 		for (Stone st : myStones) {
-			/// prï¿½fe ob der Stein im Stack ist
+			/// prüfe ob der Stein im Stack ist
 			if (!st.inStack) {
 				/*wenn nicht und er nicht blokiert ist, dann fï¿½ge ihn zu den Mï¿½glichen Zï¿½gen
 				Move move = new Move(player, st.x, st.y);
@@ -100,28 +50,31 @@ public class Board {
 					result.add(move);
 				}*/
 
-			} else if (st.inStack) {
-				// falls er im Stack ist, perform set up je nachdem welcher spieler dran ist
-				Vector2 vec = new Vector2 (0,0);
-				vec = new Vector2(7-board.stateConfig.stackSto[player], 0);
-			
-
-				Move move = new Move(player, vec.x, vec.y);
-				if (spotIsFree(move.x,move.y, board)) {
+			}
+		}
+		//TODO FIXME not working properly
+		//Add first row as possible moves
+		if(conf.stackSto[player] != 0) {
+			// falls ein Stein im Stack ist füge start reihe hinzu
+			Move dir = KoordHelper.playerToDirection(player);
+			Move addTo = new Move(player,0, 0 );
+			addTo.x += dir.x;
+			addTo.y += dir.y;
+			//Move move = new Move(player, vec.x, vec.y);
+			for(int i = 0; i < 7; i++) {
+				if (spotIsFree(i, 0, conf)) {
+					Move move = new Move(player,i, 0 );
 					result.add(move);
 				}
-
 			}
-
 		}
 		return result;
 	}
 
 	/**
-	 * 
-	 * @param x
-	 * @param y
-	 * @param player
+	 * Unfinished
+	 * TODO finish
+	 * @param m
 	 * @param board
 	 * @returns true if possible
 	 */
@@ -178,38 +131,45 @@ public class Board {
 	}
 
 	/**
-	 * Integrate Moves into our config
 	 * 
-	 * @param move
-	 * @return
+	 *  Integrate Moves into our config
+	 *  Hier wird ein Zug gemacht auf dem SpielBrett. Jenachdem welcher Spieler und
+	 *  wie viele Steine gesprungen werden sollen verï¿½dnert sich der Bewegungs Vektor
+	 * @param x
+	 * @param y
+	 * @param playerNumber
+	 * @param howManyFields
+	 * @param board
 	 */
-
 	/*
-	 * Hier wird ein Zug gemacht auf dem SpielBrett. Jenachdem welcher Spieler und
-	 * wie viele Steine gesprungen werden sollen verï¿½dnert sich der Bewegungs Vektor
-	 */
-	public void moveStone(int x, int y, int playerNumber, int howManyFields, Board board) {
-
-		// bestimme den RichtungsVektor fï¿½r den aktuellen Zug
+	Springend über eine beliebig lange Kette von abwechselnd nicht-eigenen Steinen und leeren Feldern.
+	Der Zug endet entweder auf dem letzten leeren Feld der Kette oder der Stein wird vom Spielbrett entfernt,
+	falls die Kette am Spielbrettrand mit einem nicht-eigenen Stein endet.
+	--ich denke das heißt wir gehen davon aus das man immer die maximale Anzahl springt da wir ja nur koordinaten vom Server bekommen.
+	*/
+	public void moveStone(Move move ) {//, int howManyFields) {
+		// bestimme den RichtungsVektor für den aktuellen Zug
 		Vector2 moveDir = new Vector2(0, 0);
-
-		switch (playerNumber) {
-		case 0:
-
-			moveDir.y = 1 * howManyFields;
-			break;
-		case 1:
-
-			moveDir.x = 1 * howManyFields;
-			break;
-		case 2:
-
-			moveDir.y = -1 * howManyFields;
-			break;
-		case 3:
-
-			moveDir.x = -1 * howManyFields;
-			break;
+		int howManyFields = 1;
+		int x = move.x;
+		int y = move.y;
+		
+		switch (move.player) {
+			case 0:
+				moveDir.y = 1 * howManyFields;
+				break;
+				
+			case 1:
+				moveDir.x = 1 * howManyFields;
+				break;
+				
+			case 2:
+				moveDir.y = -1 * howManyFields;
+				break;
+				
+			case 3:
+				moveDir.x = -1 * howManyFields;
+				break;
 		}
 
 		if (howManyFields != 0) {
@@ -226,51 +186,65 @@ public class Board {
 			}
 
 		} else {
-
-			for (Stone st : board.stateConfig.stones) {
-
-				if (st.inStack && st.player == playerNumber) {
-
+			for (Stone st : stateConfig.stones) {
+				if (st.inStack && st.player == move.player) {
 					st.x = (byte) x;
 					st.y = (byte) y;
 					st.inStack = false;
-					board.stateConfig.stackSto[playerNumber]--;
+					stateConfig.stackSto[move.player]--;
+					stateConfig.ptr++;
 					return;
 				}
 			}
 		}
 	}
 
-	/*
+	/**
 	 * hier wird der Korrespondierende Stein auf dem Brett gefunden und dann nach
-	 * vorne gezogen TODO: Jump modifier einbauen,
+	 * vorne gezogen TODO: Jump modifier einbauen
 	 * 
+	 * @param move
+	 * @param board
 	 */
-	public void makeMove(Move move, int PlayerNumber, Board board) {
-
-		if (stateConfig.stackSto[PlayerNumber] == 0) {
-
-			// Fall keine Steine mehr im Stack
-			moveStone(move.x, move.y, PlayerNumber, 1, board);
-
+	public void makeMove(Move move) {
+		
+		if (stateConfig.stackSto[move.player] == 0) {
+			// Falls keine Steine mehr im Stack
+			moveStone(move);
+		}else if(stateConfig.stackSto[move.player] == 7){
+			//Stein wird aufjedenfall aus dem Stack platziert
+			Stone stone = stateConfig.stones[(stateConfig.stackSto[move.player]*move.player+1)-1]; 
+			//get the index through the fixed index in the konstruktor
+			if(stone != null) {
+				stateConfig.ptr++;
+				stone.inStack = false;
+				stone.x = (byte) move.x;
+				stone.y = (byte) move.y;
+			}
+		}else {
+			Stone stone = stateConfig.stones[(stateConfig.stackSto[move.player]*move.player+1)-1];
+			//check if move is to start row
+			stone.x = (byte) move.x;
+			stone.y = (byte) move.y;
 		}
 	}
 
-	public static Stone[] getMyStones(int player, Board board) {
+	
+	//TODO write function
+	//check if move is starting row
+	
+	public Stone[] getMyStones(int player, Config conf) {
 		Stone myStones[] = new Stone[7];
-		int indexer= 0;
+		
 		// finde meine Steine
-		for (int i = 0; i < board.stateConfig.stones.length;i++) {
-
-			if (board.stateConfig.stones[i].player == player) {
-				myStones[indexer] = board.stateConfig.stones[i];
-				indexer++;
+		for (int i = 0,j= 0; i < conf.stones.length;i++) {
+			if (conf.stones[i].player == player) {
+				myStones[j] = conf.stones[i];
+				j++; //counter of found stones
 			}
-
 		}
 
 		return myStones;
-
 	}
 
 	public boolean addMoveToBoard(Move move) {
@@ -294,9 +268,9 @@ public class Board {
 	 * @param y
 	 * @returns requested Stone or Null
 	 */
-	public Stone getStoneAtKoord(byte x, byte y) {
+	public Stone getStoneAtKoord(int x, int y) {
 		assert x >= 0 && y >= 0;
-		for (int i = 0; i < stateConfig.ptr; i++) {
+		for (int i = 0; i < stateConfig.stones.length; i++) { //use stateConfig.ptr for better perfomance
 			if (stateConfig.stones[i].x == x && stateConfig.stones[i].y == y) {
 				return stateConfig.stones[i];
 			}
@@ -304,8 +278,15 @@ public class Board {
 		return null;
 	}
 
-	public static boolean spotIsFree(int x, int y, Board board) {
-		for (Stone stone : board.stateConfig.stones) {
+	/**
+	 * 
+	 * @param x
+	 * @param y
+	 * @param board
+	 * @returns true if spot is free
+	 */
+	public static boolean spotIsFree(int x, int y, Config conf) {
+		for (Stone stone : conf.stones) {
 			if (x == stone.x && y == stone.y) {
 				// if stone at position
 				return false;

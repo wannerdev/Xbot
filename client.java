@@ -13,28 +13,29 @@ public class client {
 
 	//java -Djava.library.path=C:\Users\Johannes\Dropbox\Java\sawhian\lib\native -jar C:\Users\Johannes\Dropbox\Java\sawhian\sawhian.jar 4 1600 900
 	//Laptop auflösung server
+	
+	
 	//Man bekommt nur die position des steines nicht das Ziel da der Stein ja nur in eine Richtung kann
 	public static void main (String[] args) {		
 		try {
 			
 			String logoh ="cybran";			
-			BufferedImage logo = ImageIO.read(new File("src/xbot/"+logoh+".png"));
+			BufferedImage logo = ImageIO.read(new File("xbot/"+logoh+".png"));
 			Integer num = (int) (Math.random()*50);
 	        NetworkClient client = new NetworkClient(null, "XBot"+num.toString()+"000", logo);
 	        int myNumber = client.getMyPlayerNumber();
 	        System.out.println(myNumber);
         
         	Board b = new Board();
-        	
-        	b.init();
-        	int x=0, y=0;
+        	GameTree tree = new GameTree();
         	while(true) {
 	            Move move = client.receiveMove(); //Man bekommt auch den eigenen Zug
-	        	Move lastmove =  Board.bestMove(myNumber, b);//new Move(client.getMyPlayerNumber(), x,y);
+	        	Move lastmove =  tree.bestMove(myNumber, b);
                 //ich bin dran
 	            if (move == null) {
-	            	if(myNumber ==0) {
+	            	if(myNumber == 0) {
 	            		//if(Board.isValidMove(lastmove, b )) {
+	            		    //lastmove =  new Move(0,5,myNumber);
 	            			client.sendMove(lastmove);
 	            			
 	            		//}
@@ -44,15 +45,15 @@ public class client {
 		                client.sendMove(lastmove);
 	            	}
 
-	            	b.moveStone(lastmove.x,lastmove.y,myNumber,0,b);
 	            }else {
 	                //baue Zug in meine spielfeldrepräsentation ein
-	            	b.moveStone(move.x,move.y,myNumber,0,b);
 	            }
+	            //lastmove.
+            	b.makeMove(lastmove);
 
         	}
     	}catch(Exception e) {
-	    		System.out.println(e.getLocalizedMessage());
+	    		System.out.println("Something killed it \n"+e.getLocalizedMessage());
     	}
 	}
 	

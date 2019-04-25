@@ -7,6 +7,7 @@ public class Stone {
 
 	//Coords absolute, decided 22.04
 	byte x, y, player;
+	public boolean inStack = true;
 	
 	Stone(byte x, byte y, byte player){
 		this.x = x;
@@ -22,14 +23,7 @@ public class Stone {
 		Move dir = KoordHelper.playerToDirection(player);
 		return (bo.getStoneAtKoord((byte)(x+dir.x),(byte)(y+dir.y)) != null) && (bo.getStoneAtKoord((byte)(x+dir.x), (byte)(y+dir.y)) != null);
 	}
-	
-	public boolean inStack = true;
 		
-		
-		
-		
-	
-	
 	/**
 	 * 
 	 * @param stone

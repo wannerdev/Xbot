@@ -16,7 +16,7 @@ public class KoordHelper {
 		return move;
 	}
 	
-	public static Move playerToDirection(byte player) {
+	public static Move playerToDirection(int player) {
 		assert player <=3 && player > -1;
 		switch(player) {
 	    	case 0:
