@@ -20,7 +20,7 @@ public class client {
 		try {
 			
 			String logoh ="cybran";			
-			BufferedImage logo = ImageIO.read(new File("xbot/"+logoh+".png"));
+			BufferedImage logo = ImageIO.read(new File("src/xbot/"+logoh+".png"));
 			Integer num = (int) (Math.random()*50);
 	        NetworkClient client = new NetworkClient(null, "XBot"+num.toString()+"000", logo);
 	        int myNumber = client.getMyPlayerNumber();
@@ -34,11 +34,15 @@ public class client {
                 //ich bin dran
 	            if (move == null) {
 	            	if(myNumber == 0) {
-	            		//if(Board.isValidMove(lastmove, b )) {
+	            		if(Board.isValidMove(lastmove, b )) {
 	            		    //lastmove =  new Move(0,5,myNumber);
 	            			client.sendMove(lastmove);
 	            			
-	            		//}
+	            		}else {
+	            			//trying to play acomplete game
+	            			Move stM = new Move ( myNumber, b.stateConfig.stones[myNumber*7].x, b.stateConfig.stones[myNumber*7].y);
+	            			client.sendMove(KoordHelper.rotate((byte)myNumber, stM));	            			
+	            		}
 	            	}else {
 	            		// ansonsten rotiere das spielbrett f�r den entsprechenden Spieler       		
 	            		lastmove = KoordHelper.rotate((byte)myNumber, lastmove);
@@ -53,7 +57,7 @@ public class client {
 
         	}
     	}catch(Exception e) {
-	    		System.out.println("Something killed it \n"+e.getLocalizedMessage());
+	    		System.err.println("Exception: \n"+e.getLocalizedMessage());
     	}
 	}
 	

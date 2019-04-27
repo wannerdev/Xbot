@@ -17,7 +17,6 @@ public class Board {
 	// set up the stones and assign them a player number
 	public Board() {
 		stateConfig = new Config();
-		stateConfig.stones = new Stone[28];
 		
 		for (int i = 0; i < stateConfig.stones.length; i++) {
 			stateConfig.stones[i] = new Stone ((byte)-1,(byte)-1,(byte)0);
@@ -42,7 +41,7 @@ public class Board {
 		List<Move> result = new ArrayList<Move>();
 		Stone[] myStones = this.getMyStones(player, conf);
 		for (Stone st : myStones) {
-			/// prüfe ob der Stein im Stack ist
+			/// prï¿½fe ob der Stein im Stack ist
 			if (!st.inStack) {
 				/*wenn nicht und er nicht blokiert ist, dann fï¿½ge ihn zu den Mï¿½glichen Zï¿½gen
 				Move move = new Move(player, st.x, st.y);
@@ -55,7 +54,7 @@ public class Board {
 		//TODO FIXME not working properly
 		//Add first row as possible moves
 		if(conf.stackSto[player] != 0) {
-			// falls ein Stein im Stack ist füge start reihe hinzu
+			// falls ein Stein im Stack ist fï¿½ge start reihe hinzu
 			Move dir = KoordHelper.playerToDirection(player);
 			Move addTo = new Move(player,0, 0 );
 			addTo.x += dir.x;
@@ -71,6 +70,11 @@ public class Board {
 		return result;
 	}
 
+/*Test what does the server do in
+	
+	-x
+	-
+	---
 	/**
 	 * Unfinished
 	 * TODO finish
@@ -86,16 +90,11 @@ public class Board {
 		// check if spot is empty and not in the first row.
 		for (Stone stone : board.stateConfig.stones) {
 			if (x == stone.x && y == stone.y) {
-				// If my own stone,
-				// TODO and has space ahead or Jumping, In Stone ?
+				// If my own stone
 				if (stone.player == m.player) {
-					// Move iffree = new Move(m.x,m.y,m.player);
-					m.x += KoordHelper.playerToDirection((byte) m.player).x;
-					m.y += KoordHelper.playerToDirection((byte) m.player).y;
-					if (!stone.isBlocked(board)) {
+					if (!stone.isBlocked(board) || stone.canJump(board)>0) {
 						return true;
 					}
-					return true;// for the moment
 				} else {
 					// can't move someone elses stone
 					return false;
@@ -142,15 +141,19 @@ public class Board {
 	 * @param board
 	 */
 	/*
-	Springend über eine beliebig lange Kette von abwechselnd nicht-eigenen Steinen und leeren Feldern.
+	Springend ï¿½ber eine beliebig lange Kette von abwechselnd nicht-eigenen Steinen und leeren Feldern.
 	Der Zug endet entweder auf dem letzten leeren Feld der Kette oder der Stein wird vom Spielbrett entfernt,
 	falls die Kette am Spielbrettrand mit einem nicht-eigenen Stein endet.
-	--ich denke das heißt wir gehen davon aus das man immer die maximale Anzahl springt da wir ja nur koordinaten vom Server bekommen.
+	--ich denke das heiï¿½t wir gehen davon aus das man immer die maximale Anzahl springt da wir ja nur koordinaten vom Server bekommen.
 	*/
-	public void moveStone(Move move ) {//, int howManyFields) {
-		// bestimme den RichtungsVektor für den aktuellen Zug
+	public void moveStone(Move move ) {
+		// bestimme den RichtungsVektor fï¿½r den aktuellen Zug
 		Vector2 moveDir = new Vector2(0, 0);
 		int howManyFields = 1;
+		int jmp = this.getStone(move.x, move.y).canJump(this);
+		if(jmp > 0) {
+			howManyFields = jmp*2; //if we can jump we have to jump.
+		}
 		int x = move.x;
 		int y = move.y;
 		
@@ -207,25 +210,32 @@ public class Board {
 	 * @param board
 	 */
 	public void makeMove(Move move) {
-		
+		Stone stone =null;
 		if (stateConfig.stackSto[move.player] == 0) {
 			// Falls keine Steine mehr im Stack
 			moveStone(move);
 		}else if(stateConfig.stackSto[move.player] == 7){
 			//Stein wird aufjedenfall aus dem Stack platziert
-			Stone stone = stateConfig.stones[(stateConfig.stackSto[move.player]*move.player+1)-1]; 
+			stone = stateConfig.stones[(stateConfig.stackSto[move.player]*move.player+1)-1]; 
 			//get the index through the fixed index in the konstruktor
-			if(stone != null) {
+			assert (stone.player == move.player);
+			if(stone != null ) {
 				stateConfig.ptr++;
 				stone.inStack = false;
 				stone.x = (byte) move.x;
 				stone.y = (byte) move.y;
 			}
 		}else {
-			Stone stone = stateConfig.stones[(stateConfig.stackSto[move.player]*move.player+1)-1];
-			//check if move is to start row
+			stone = stateConfig.stones[(stateConfig.stackSto[move.player]*move.player+1)-1];
+			if(getStone(move.x, move.y)!=null) {
+				moveStone(move);				
+			}
+			//check if move is to start row if yes get the stone and do the necessary stuff
+			stateConfig.ptr++;
+			stone.inStack = false;
 			stone.x = (byte) move.x;
 			stone.y = (byte) move.y;
+			moveStone(move);
 		}
 	}
 
@@ -269,7 +279,9 @@ public class Board {
 	 * @returns requested Stone or Null
 	 */
 	public Stone getStoneAtKoord(int x, int y) {
-		assert x >= 0 && y >= 0;
+		//respect board borders
+		if( (x >= 0 && y >= 0 && x <8 && y<8)==false)return null;
+		//search for stone		
 		for (int i = 0; i < stateConfig.stones.length; i++) { //use stateConfig.ptr for better perfomance
 			if (stateConfig.stones[i].x == x && stateConfig.stones[i].y == y) {
 				return stateConfig.stones[i];
@@ -277,6 +289,25 @@ public class Board {
 		}
 		return null;
 	}
+	
+	/**
+	 * 
+	 * @param x
+	 * @param y
+	 * @returns null or Stone
+	 */
+	public Stone getStone(int x, int y) {
+		//respect board borders
+		if( (x >= 0 && y >= 0 && x <8 && y<8)==false)return null;
+		//search for stone
+		int i=0;
+		while(i<stateConfig.stones.length && (stateConfig.stones[i].x != x && stateConfig.stones[i].y != y)) {
+			i++;
+		}
+		if(i != stateConfig.stones.length)return stateConfig.stones[i];
+		return null;
+	}
+		
 
 	/**
 	 * 

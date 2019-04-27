@@ -1,6 +1,5 @@
 package Xbot;
 
-import Xbot.Board.Config;
 import lenz.htw.sawhian.Move;
 
 public class Stone {
@@ -16,25 +15,41 @@ public class Stone {
 	}
 	/**
 	 * if two stones ahead	
+	 * if in stack stone is not blocked
 	 * @param bo
 	 * @return
 	 */
 	boolean isBlocked(Board bo) {		
 		Move dir = KoordHelper.playerToDirection(player);
-		return (bo.getStoneAtKoord((byte)(x+dir.x),(byte)(y+dir.y)) != null) && (bo.getStoneAtKoord((byte)(x+dir.x), (byte)(y+dir.y)) != null);
+		return !inStack||(bo.getStone((x+dir.x), (y+dir.y)) != null) && (bo.getStone((x+dir.x*2), (y+dir.y*2)) != null);
 	}
-		
+	
 	/**
 	 * 
-	 * @param stone
-	 * @return return negative if blocked after jump
+	 * @param board 
+	 * @returns amount of possible jumps 0,1,2,3
 	 */
-	byte canJump(Config config) {
-		//hasone ahead and space
+	byte canJump(Board bo) {
+		Move dir = KoordHelper.playerToDirection(player);	
+		byte result=0;
+		//has one ahead and space behin
+		if((bo.getStone((x+dir.x), (y+dir.y)) != null) && (bo.getStone((x+dir.x*2), (y+dir.y*2)) == null)) {
+			result = 1;
+		}
 		//hastwo ahead and two space
+		if((bo.getStone((x+dir.x*3), (y+dir.y*3)) != null) && (bo.getStone((x+dir.x*4), (y+dir.y*4)) == null) ) {
+			result++;	
+		}
 		//hasthree ahead and three space
-		return 3;
+		if(result ==2 &&(bo.getStone((x+dir.x*5), (y+dir.y*5)) != null) && (bo.getStone((x+dir.x*6), (y+dir.y*6)) == null) ) {
+			result=3;
+		}
+		return result;
+		
+		
 	}
+	
+	
 	
 	byte distanceToGoal(){
 		//switch()
