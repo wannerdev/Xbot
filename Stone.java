@@ -33,15 +33,15 @@ public class Stone {
 		Move dir = KoordHelper.playerToDirection(player);	
 		byte result=0;
 		//has one ahead and space behin
-		if((bo.getStone((x+dir.x), (y+dir.y)) != null) && (bo.getStone((x+dir.x*2), (y+dir.y*2)) == null)) {
+		if((bo.getStone((x+dir.x), (y+dir.y)) != null) && bo.getStone((x+dir.x), (y+dir.y)).player !=this.player && (bo.getStone((x+dir.x*2), (y+dir.y*2)) == null)) {
 			result = 1;
 		}
 		//hastwo ahead and two space
-		if((bo.getStone((x+dir.x*3), (y+dir.y*3)) != null) && (bo.getStone((x+dir.x*4), (y+dir.y*4)) == null) ) {
+		if((bo.getStone((x+dir.x*3), (y+dir.y*3)) != null) && bo.getStone((x+dir.x), (y+dir.y)).player !=this.player &&  (bo.getStone((x+dir.x*4), (y+dir.y*4)) == null) ) {
 			result++;	
 		}
 		//hasthree ahead and three space
-		if(result ==2 &&(bo.getStone((x+dir.x*5), (y+dir.y*5)) != null) && (bo.getStone((x+dir.x*6), (y+dir.y*6)) == null) ) {
+		if(result ==2 &&(bo.getStone((x+dir.x*5), (y+dir.y*5)) != null)&& bo.getStone((x+dir.x), (y+dir.y)).player !=this.player && (bo.getStone((x+dir.x*6), (y+dir.y*6)) == null) ) {
 			result=3;
 		}
 		return result;
