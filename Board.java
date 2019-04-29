@@ -50,7 +50,7 @@ public class Board {
 		for (Stone st : myStones) {
 			/// prüfe ob der Stein im Stack ist
 			if (!st.inStack && !st.isBlocked(this)) {
-				//wenn nicht im stack und er nicht blokiert ist, dann fï¿½ge ihn zu den Mï¿½glichen Zï¿½gen
+				//wenn nicht im stack und er nicht blockiert ist, dann fï¿½ge ihn zu den Mï¿½glichen Zï¿½gen
 				if(st.x > 6 && st.y > 6) {
 					throw new Exception("bounds");
 				}
@@ -63,8 +63,8 @@ public class Board {
 		}
 		//TODO FIXME not working properly
 		//Add first row as possible moves
-		if(conf.stackSto[player] != 0) {
-			// falls ein Stein im Stack ist fï¿½ge start reihe hinzu
+		if(conf.stackSto[player] > 0) {
+			// falls ein Stein im Stack ist füge start reihe hinzu
 			Move dir = KoordHelper.playerToDirection(player);
 			Move addTo = new Move(player,0, 0 );
 			addTo.x += dir.x;
@@ -73,7 +73,9 @@ public class Board {
 			for(int i = 0; i < 7; i++) {
 				if (spotIsFree(i, 0, conf)) {
 					Move move = new Move(player,i, 0 );
-					result.add(move);
+					if (isValidMove(move, this)) {
+						result.add(move);
+					}
 				}
 			}
 		}
@@ -114,26 +116,26 @@ public class Board {
 		// check if stack is not empty ,
 		if (board.stateConfig.stackSto[m.player] > 0) {
 			switch (m.player) {
-			case 0:
-				if (y == 0) {
-					return true;
-				}
-				break;
-			case 1:
-				if (x == 0) {
-					return true;
-				}
-				break;
-			case 2:
-				if (y == 6) {
-					return true;
-				}
-				break;
-			case 3:
-				if (x == 6) {
-					return true;
-				}
-				break;
+				case 0:
+					if (y == 0) {
+						return true;
+					}
+					break;
+				case 1:
+					if (x == 0) {
+						return true;
+					}
+					break;
+				case 2:
+					if (y == 6) {
+						return true;
+					}
+					break;
+				case 3:
+					if (x == 6) {
+						return true;
+					}
+					break;
 			}
 		}
 		return false;
@@ -324,7 +326,7 @@ public class Board {
 	 */
 	public Stone getStone(int x, int y) {
 		//respect board borders
-		if( (x >= 0 && y >= 0 && x <8 && y<8)==false)return null;
+		if( (x >= 0 && y >= 0 && x <7 && y<7)==false)return null;
 		//search for stone
 		int i=0;
 		while(i<stateConfig.stones.length && (stateConfig.stones[i].x != x && stateConfig.stones[i].y != y)) {

@@ -35,28 +35,20 @@ public class client {
                 //ich bin dran
 	            if (move == null) {
 	            	if(myNumber == 0) {
-	            		if(Board.isValidMove(lastmove, b )) {
-	            			client.sendMove(lastmove);
+	            		//player 0
+            			client.sendMove(lastmove);
 	            			
-	            		}else {
-	            			System.err.println("Nonvalid -> stupid move");
-	            			//trying to play a complete game
-	            			lastmove = new Move ( myNumber, b.stateConfig.stones[myNumber*7].x, b.stateConfig.stones[myNumber*7].y);
-	            			client.sendMove(lastmove);	            			
-	            		}
-	            	}else {
-	            		if(Board.isValidMove(lastmove, b )) {
-		            		// ansonsten rotiere das spielbrett fÔøΩr den entsprechenden Spieler       		
-			                client.sendMove(KoordHelper.rotate((byte)myNumber, lastmove));
-	            			
-	            		}else {
-	            			System.err.println("Nonvalid -> stupid move");
-	            			//trying to play a complete game
-	            			lastmove = new Move ( myNumber, b.stateConfig.stones[myNumber*7].x, b.stateConfig.stones[myNumber*7].y);       		
-	            			client.sendMove(KoordHelper.rotate((byte)myNumber, lastmove));	            			
-	            		}
-	            	}
-
+            		}else {
+	            		// ansonsten rotiere das spielbrett f¸r den entsprechenden Spieler       		
+		                client.sendMove(KoordHelper.rotate((byte)myNumber, lastmove));
+            			
+            		}
+	            	/*else {
+            			System.err.println("Nonvalid -> stupid move");
+            			//trying to play a complete game
+            			lastmove = new Move ( myNumber, b.stateConfig.stones[myNumber*7].x, b.stateConfig.stones[myNumber*7].y);       		
+            			client.sendMove(KoordHelper.rotate((byte)myNumber, lastmove));	            			
+            		}*/
 	            }else {
 	                //baue Zug in meine spielfeldrepr√§sentation ein
 	            	b.makeMove(lastmove);
@@ -64,7 +56,7 @@ public class client {
 	            }
         	}
     	}catch(Exception e) {
-	    		System.err.println("Exception: \n"+e.getLocalizedMessage());
+    		System.err.println("Exception: \n"+e.getLocalizedMessage());
     	}
 	}
 	
