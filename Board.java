@@ -40,39 +40,39 @@ public class Board {
 	public List<Move> calcFreeMoves(int player, Board board) throws Exception {
 		// Evtl ein Set nehmen?
 		List<Move> result = new ArrayList<Move>();
-		/*Stone[] myStones = this.getMyStones(player, conf);
-		for (Stone st : myStones) {
-			/// pr�fe ob der Stein im Stack ist
-			if (!st.inStack) { // !st.isBlocked(this)
-				// wenn nicht im stack und er nicht blockiert ist, dann f�ge ihn zu den
-				// M�glichen Z�gen
-				Move move = new Move(player, st.x, st.y);
-				if (isValidMove(move, this)) {
-					result.add(move);
-				}
-
-			}
-		}*/
 
 		if (board.stateConfig.stackSto[player] > 0) {
 			// falls ein Stein im Stack ist f�ge start reihe hinzu, wenn nicht durch gegner
 			// oder blockierten stein belegt
 
 			for (int i = 0; i < 7; i++) {
-				
+
 				Move relMove = new Move(player, i, 0);
 				Move absMove = relMove;
-				if (player !=0) {
-					
-				 absMove = KoordHelper.rotate(player, relMove);
+				if (player != 0) {
+
+					absMove = KoordHelper.rotate(player, relMove);
 				}
-              if (spotIsFree(absMove.x,absMove.y,board.stateConfig)) {
-            	  if (isValidMove(absMove, board)) {
-  					result.add(relMove);
-  					// System.out.println("Added Move: "+m);
-  				}
-              }
-				
+				if (spotIsFree(absMove.x, absMove.y, board.stateConfig)) {
+					if (isValidMove(absMove, board)) {
+						result.add(relMove);
+						// System.out.println("Added Move: "+m);
+					}
+				}
+
+			}
+		}
+
+		Stone[] myStones = this.getMyStones(player, board.stateConfig);
+		for (Stone st : myStones) {
+			/// pr�fe ob der Stein im Stack ist
+			
+	
+			if (!st.inStack) {
+				Move move = new Move(player, st.x, st.y);
+				if (isValidMove(move, board)) {
+					result.add(move);
+				}
 
 			}
 		}
@@ -195,23 +195,13 @@ public class Board {
 						// wenn wir den richtigen Stein haben, mach den Zug mit dem Stein
 						st.x += moveDir.x;
 						st.y += moveDir.y;
+						
 						break;
 					}
 				}
 			}
 
-		} else {
-			for (Stone st : stateConfig.stones) {
-				if (st.inStack && st.player == move.player) {
-					st.x = (byte) x;
-					st.y = (byte) y;
-					st.inStack = false;
-					stateConfig.stackSto[move.player]--;
-					stateConfig.ptr++;
-					return;
-				}
-			}
-		}
+		} 
 	}
 
 	/**
@@ -313,7 +303,7 @@ public class Board {
 	 */
 	public Stone getStoneAtKoord(int x, int y) {
 		// respect board borders
-		if ((x >= 0 && y >= 0 && x < 8 && y < 8) == false)
+		if ((x >= 0 && y >= 0 && x < 7 && y < 7) == false)
 			return null;
 		// search for stone
 		for (int i = 0; i < stateConfig.stones.length; i++) { // use stateConfig.ptr for better perfomance
