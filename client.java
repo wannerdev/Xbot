@@ -21,7 +21,7 @@ public class client {
 		try {
 			
 			String logoh ="cybran";			
-			BufferedImage logo = ImageIO.read(new File("xbot/"+logoh+".png"));
+			BufferedImage logo = ImageIO.read(new File("src/xbot/"+logoh+".png"));
 			Integer num = (int) (Math.random()*50);
 	        NetworkClient client = new NetworkClient(null, "XBot"+num.toString()+"000", logo);
 	        int myNumber = client.getMyPlayerNumber();
@@ -39,8 +39,8 @@ public class client {
             			client.sendMove(lastmove);
 	            			
             		}else {
-	            		// ansonsten rotiere das spielbrett für den entsprechenden Spieler       		
-		                client.sendMove(KoordHelper.rotate((byte)myNumber, lastmove));
+	            		// ansonsten rotiere das spielbrett fï¿½r den entsprechenden Spieler       		
+		                client.sendMove(lastmove);
             			
             		}
 	            	/*else {
@@ -53,6 +53,7 @@ public class client {
 	                //baue Zug in meine spielfeldreprÃ¤sentation ein
 	            	b.makeMove(lastmove);
 	            	System.out.println(" Anzahl steine: "+b.stateConfig.ptr);
+	            	System.out.println(b.stateConfig.toString());
 	            }
         	}
     	}catch(Exception e) {

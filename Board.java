@@ -8,12 +8,8 @@ import lenz.htw.sawhian.Move;
 public class Board {
 	Config stateConfig;
 
-	class Config {
-		Stone stones[] = new Stone[28];
-		byte stackSto[] = { 7, 7, 7, 7 };
-		byte ptr = 0; // basically a counter how many stones on board.
-	}
 
+	
 	// set up the stones and assign them a player number
 	public Board() {
 		stateConfig = new Config();
@@ -48,7 +44,7 @@ public class Board {
 		List<Move> result = new ArrayList<Move>();
 		Stone[] myStones = this.getMyStones(player, conf);
 		for (Stone st : myStones) {
-			/// prüfe ob der Stein im Stack ist
+			/// prï¿½fe ob der Stein im Stack ist
 			if (!st.inStack && !st.isBlocked(this)) {
 				//wenn nicht im stack und er nicht blockiert ist, dann fï¿½ge ihn zu den Mï¿½glichen Zï¿½gen
 				if(st.x > 6 && st.y > 6) {
@@ -64,17 +60,31 @@ public class Board {
 		//TODO FIXME not working properly
 		//Add first row as possible moves
 		if(conf.stackSto[player] > 0) {
-			// falls ein Stein im Stack ist füge start reihe hinzu
-			Move dir = KoordHelper.playerToDirection(player);
-			Move addTo = new Move(player,0, 0 );
-			addTo.x += dir.x;
-			addTo.y += dir.y;
-			//Move move = new Move(player, vec.x, vec.y);
+			// falls ein Stein im Stack ist fï¿½ge start reihe hinzu
+			Move m = new Move(player,0,0);
 			for(int i = 0; i < 7; i++) {
-				if (spotIsFree(i, 0, conf)) {
-					Move move = new Move(player,i, 0 );
-					if (isValidMove(move, this)) {
-						result.add(move);
+				switch (m.player) {
+					case 0:
+						m.y = 0;
+						m.x = i;
+						break;
+					case 1:
+						m.x = 0;
+						m.y = i;
+						break;
+					case 2:
+						m.y = 6;
+						m.x = i;
+						break;
+					case 3:
+						m.x = 6;
+						m.y = i;
+						break;
+				}
+				if (spotIsFree(m.x, m.y, conf)) {
+					if (isValidMove(m, this)) {
+						result.add(m);
+					//	System.out.println("Added Move: "+m);
 					}
 				}
 			}
@@ -92,53 +102,33 @@ public class Board {
 	 * TODO Test if correct
 	 * @param m
 	 * @param board
+	 * @throws Exception 
 	 * @returns true if possible
 	 */
-	public static boolean isValidMove(Move m, Board board) {
-
-		byte x, y;
-		x = (byte) m.x;
-		y = (byte) m.y;
+	public static boolean isValidMove(Move m, Board board) throws Exception {
 		// check if spot is empty and not in the first row.
-		for (Stone stone : board.stateConfig.stones) {
-			if (x == stone.x && y == stone.y) {
-				// If my own stone
-				if (stone.player == m.player) {
+		Stone stone = board.getStone(m.x, m.y);
+		boolean result=false;
+		if(stone !=null) {
+				if(stone.player == m.player) {
+					// If my own stone
 					if (!stone.isBlocked(board) || stone.canJump(board)>0) {
 						return true;
 					}
-				} else {
-					// can't move someone elses stone
-					return false;
+				}else {
+					throw new Exception(" can't move someone elses stone");
 				}
-			}
 		}
 		// check if stack is not empty ,
 		if (board.stateConfig.stackSto[m.player] > 0) {
-			switch (m.player) {
-				case 0:
-					if (y == 0) {
-						return true;
-					}
-					break;
-				case 1:
-					if (x == 0) {
-						return true;
-					}
-					break;
-				case 2:
-					if (y == 6) {
-						return true;
-					}
-					break;
-				case 3:
-					if (x == 6) {
-						return true;
-					}
-					break;
+			//check if first row
+			result = board.isMoveInStartingRow(m);
+			if(!result) {
+				throw new Exception(" Invalid move not in start row"+m.toString());
 			}
 		}
-		return false;
+		return result;
+		
 	}
 
 	/**
@@ -156,7 +146,7 @@ public class Board {
 	Springend ï¿½ber eine beliebig lange Kette von abwechselnd nicht-eigenen Steinen und leeren Feldern.
 	Der Zug endet entweder auf dem letzten leeren Feld der Kette oder der Stein wird vom Spielbrett entfernt,
 	falls die Kette am Spielbrettrand mit einem nicht-eigenen Stein endet.
-	-- wir gehen davon aus das man immer die maximale Anzahl springt // Mail von Lenz als Bestätigung
+	-- wir gehen davon aus das man immer die maximale Anzahl springt // Mail von Lenz als Bestï¿½tigung
 	*/
 	public void moveStone(Move move ) {
 		// bestimme den RichtungsVektor fï¿½r den aktuellen Zug
@@ -223,7 +213,8 @@ public class Board {
 	 * @throws Exception if player is out of range
 	 */
 	public void makeMove(Move move) throws Exception {
-		Stone stone=null;
+		Stone stone = null;
+		move = KoordHelper.rotate(move.player, move);
 		if (stateConfig.stackSto[move.player] == 0 || getStone(move.x, move.y) != null) {
 			// Falls keine Steine mehr im Stack oder stein schon auf dem Brett
 			moveStone(move);
@@ -237,9 +228,11 @@ public class Board {
 			stone.inStack = false;
 			
 			stateConfig.stackSto[move.player]--;
-			
-			stone.x = (byte) move.x;
-			stone.y = (byte) move.y;
+
+			int y = move.y;
+			int x = move.x;
+			stone.x = (byte) x;
+			stone.y = (byte) y;
 			stone.player =(byte) move.player;
 			
 		}else  {
@@ -249,10 +242,13 @@ public class Board {
 				stateConfig.ptr++;
 				stone.inStack = false;
 				stateConfig.stackSto[move.player]--;
-				
-				stone.x = (byte) move.x;
-				stone.y = (byte) move.y;
-				stone.player =(byte) move.player;
+
+				int y = move.y; 
+				int x = move.x;
+				stone.x = (byte) x;
+				stone.y = (byte) y;
+				byte player = (byte) move.player;
+				stone.player = player;
 			}
 		}
 	}
@@ -266,22 +262,30 @@ public class Board {
 	}
 
 	//check if move is in starting row	
-	public boolean isMoveInStartingRow(Move move) throws Exception {
-		
-		switch (move.player) {
-				case 0:
-					return !(move.y > 0);
-					
-				case 1:
-					return !(move.x > 0);
-					
-				case 2:
-					return !(move.x < 5);
-					
-				case 3:
-					return !(move.y < 5);
+	public boolean isMoveInStartingRow(Move m) {
+		switch (m.player) {
+			case 0:
+				if (m.y == 0) {
+					return true;
+				}
+				break;
+			case 1:
+				if (m.x == 0) {
+					return true;
+				}
+				break;
+			case 2:
+				if (m.y == 6) {
+					return true;
+				}
+				break;
+			case 3:
+				if (m.x == 6) {
+					return true;
+				}
+				break;
 		}
-		throw new Exception("Player invalid");
+		return false;
 	}
 	
 	public Stone[] getMyStones(int player, Config conf) {
