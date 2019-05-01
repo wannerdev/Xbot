@@ -16,6 +16,20 @@ public class KoordHelper {
 		return move;
 	}
 	
+	
+	public static Move rotateBack(byte player, Move move) {
+		//System.out.println("Before turn"+amount+" X:"+move.x +" y:"+ move.y);
+		for(int i=0; i< player; i++) {
+			int y = move.y;
+			int x = (move.x-6)*-1;
+			move.x = y;
+			move.y = x;
+		}
+		//System.out.println("After X:"+move.x +" y:"+ move.y);
+		return move;
+	}
+	
+	
 	public static Move rotate(int player, Move move) {
 		return rotate((byte)player, move);
 	}

@@ -1,5 +1,6 @@
 package Xbot;
 
+import java.util.List;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Random;
@@ -35,27 +36,21 @@ public class client {
 			int x = 0, y = 0;
 			while (true) {
 				Move move = client.receiveMove(); // Man bekommt auch den eigenen Zug
-				Move lastmove = new Move(myNumber, x, y);// tree.bestMove(myNumber, b); //calculateOneMove(myNumber, b);
+				List<Move> freeMoves = b.calcFreeMoves(myNumber, b);
+				System.out.println("Allmoves:" + b.calcFreeMoves(myNumber, b).toString());
+				Move lastmove = freeMoves.get(0); // new Move(myNumber, x, y); tree.bestMove(myNumber, b);
+													// calculateOneMove(myNumber, b);
 				// ich bin dran
 				if (move == null) {
-					if (myNumber != 0) {
 
-						lastmove = KoordHelper.rotate(myNumber, lastmove);
-					}
-					if (Board.isValidMove(lastmove, b)) {
-						
-						client.sendMove(lastmove);
-					}else {
-						System.out.println("MY MOVE: X = " + lastmove.x + " || Y = " + lastmove.y);
-						System.out.println("MY MOVE IS INVALID");
-					}
-					
-					 x++;
+					client.sendMove(lastmove);
+
+					// x++;
 				} else {
 					// baue Zug in meine spielfeldrepräsentation ein
 					b.makeMove(move);
 					System.out.println(" Anzahl steine: " + b.stateConfig.ptr);
-	            	System.out.println("Allmoves:"+b.calcFreeMoves(myNumber, b.stateConfig).toString());
+
 					System.out.println(b.stateConfig.toString());
 					System.out.println("MOVE: X = " + move.x + " || Y = " + move.y);
 
