@@ -29,7 +29,7 @@ public class client {
         
         	Board b = new Board();
         	GameTree tree = new GameTree();
-        	int x=0,y=0;
+        	int x=4,y=0;
         	while(true) {
 	            Move move = client.receiveMove(); //Man bekommt auch den eigenen Zug
 	        	Move lastmove =  new Move(myNumber,x,y);//tree.bestMove(myNumber, b); //calculateOneMove(myNumber, b); 
@@ -52,7 +52,7 @@ public class client {
             		}*/
 	            }else {
 	                //baue Zug in meine spielfeldrepräsentation ein
-	            	b.makeMove(lastmove);
+	            	b.makeMove(move);
 	            	System.out.println(" Anzahl steine: "+b.stateConfig.ptr);
 	            	System.out.println(b.stateConfig.toString());
 	            }

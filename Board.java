@@ -213,7 +213,6 @@ public class Board {
 	 */
 	public void makeMove(Move move) throws Exception {
 		Stone stone = null;
-		move = KoordHelper.rotate(move.player, move);
 		if (stateConfig.stackSto[move.player] == 0 || getStone(move.x, move.y) != null) {
 			// Falls keine Steine mehr im Stack oder stein schon auf dem Brett
 			moveStone(move);
