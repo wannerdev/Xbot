@@ -24,13 +24,13 @@ public class KoordHelper {
 		assert player <=3 && player > -1;
 		switch(player) {
 	    	case 0:
-		    	return new Move(0,1,player);
+		    	return new Move(player,0,1);
 	    	case 1:
-	    		return new Move(1,0,player);
+	    		return new Move(player,1,0);
 	    	case 2:
-	    		return new Move(0,-1,player);
+	    		return new Move(player,0,-1);
 	    	case 3:
-	    		return new Move(-1,0,player);
+	    		return new Move(player,-1,0);
 		}
 		return null;
 	}

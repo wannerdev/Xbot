@@ -21,7 +21,35 @@ public class Stone {
 	 */
 	boolean isBlocked(Board bo) {		
 		Move dir = KoordHelper.playerToDirection(player);
-		return !inStack||(bo.getStone((x+dir.x), (y+dir.y)) != null) && (bo.getStone((x+dir.x*2), (y+dir.y*2)) != null);
+		
+	    
+		if (!inStack) {
+			// if im not in stack get my forward neigbor
+			Stone neighbor = bo.getStoneAtKoord((x+dir.x), (y+dir.y));
+			if (neighbor != null) {
+				// if that neighbor exists
+				if (neighbor.player == player) {
+					// if the neighbor is one of my stones retrun true
+					return true;
+								
+				}else {
+					// if he isnt check if the field behind him is free 
+					
+					Stone farNeighbor = bo.getStoneAtKoord((x+dir.x*2), (y+dir.y*2));
+					if (farNeighbor != null) {
+						
+						return true;
+					}
+					
+				}
+				
+				
+			}
+			
+		}
+		
+		return false;
+		//return !inStack||(bo.getStone((x+dir.x), (y+dir.y)) != null) && (bo.getStone((x+dir.x*2), (y+dir.y*2)) != null);
 	}
 	
 	/**
@@ -33,15 +61,15 @@ public class Stone {
 		Move dir = KoordHelper.playerToDirection(player);	
 		byte result=0;
 		//has one ahead and space behin
-		if((bo.getStone((x+dir.x), (y+dir.y)) != null) && bo.getStone((x+dir.x), (y+dir.y)).player !=this.player && (bo.getStone((x+dir.x*2), (y+dir.y*2)) == null)) {
+		if((bo.getStoneAtKoord((x+dir.x), (y+dir.y)) != null) && bo.getStoneAtKoord((x+dir.x), (y+dir.y)).player !=this.player && (bo.getStoneAtKoord((x+dir.x*2), (y+dir.y*2)) == null)) {
 			result = 1;
 		}
 		//hastwo ahead and two space
-		if((result ==1 && bo.getStone((x+dir.x*3), (y+dir.y*3)) != null) && bo.getStone((x+dir.x), (y+dir.y)).player !=this.player &&  (bo.getStone((x+dir.x*4), (y+dir.y*4)) == null) ) {
+		if((result ==1 && bo.getStoneAtKoord((x+dir.x*3), (y+dir.y*3)) != null) && bo.getStoneAtKoord((x+dir.x), (y+dir.y)).player !=this.player &&  (bo.getStoneAtKoord((x+dir.x*4), (y+dir.y*4)) == null) ) {
 			result++;	
 		}
 		//hasthree ahead and three space
-		if(result ==2 &&(bo.getStone((x+dir.x*5), (y+dir.y*5)) != null)&& bo.getStone((x+dir.x), (y+dir.y)).player !=this.player && (bo.getStone((x+dir.x*6), (y+dir.y*6)) == null) ) {
+		if(result ==2 &&(bo.getStoneAtKoord((x+dir.x*5), (y+dir.y*5)) != null)&& bo.getStoneAtKoord((x+dir.x), (y+dir.y)).player !=this.player && (bo.getStoneAtKoord((x+dir.x*6), (y+dir.y*6)) == null) ) {
 			result++;
 		}
 		return result;

@@ -105,28 +105,49 @@ public class Board {
 	 * @returns true if possible
 	 */
 	public static boolean isValidMove(Move m, Board board) throws Exception {
-		// check if spot is empty and not in the first row.
-		Stone stone = board.getStone(m.x, m.y);
-		boolean result = false;
-		if (stone != null) {
-			if (stone.player == m.player) {
-				// If my own stone
-				if (!stone.isBlocked(board) || stone.canJump(board) > 0) {
-					return true;
-				}
+
+		// first check if there is a stone on the coordinates
+		Stone stone = board.getStoneAtKoord(m.x, m.y);
+		if (stone == null) {
+			// if there isnt at stone at this position check if its in the first row
+			if (!board.isMoveInStartingRow(m)) {
+				// if it isnt then it cant be a valid move
+				return false;
+			}
+			// if the move is in the starting row, check if I still have stones in my stack
+			if (board.stateConfig.stackSto[m.player] > 0) {
+				// if I have stones in my Stack return true
+				return true;
 			} else {
-				throw new Exception(" can't move someone elses stone");
+				// otherwise no
+				return false;
 			}
-		}
-		// check if stack is not empty ,
-		if (board.stateConfig.stackSto[m.player] > 0) {
-			// check if first row
-			result = board.isMoveInStartingRow(m);
-			if (!result) {
-				throw new Exception(" Invalid move not in start row" + m.toString());
+
+		} else {
+			// if there is a stone at this position
+			if (stone.player != m.player) {
+				// if the stone is not mine return false;
+				return false;
+			} else {
+
+				// check if its blocked and return that
+				return !stone.isBlocked(board);
+
 			}
+
 		}
-		return result;
+
+		// if
+
+		/*
+		 * if (stone != null) { if (stone.player == m.player) { // If my own stone if
+		 * (!stone.isBlocked(board) || stone.canJump(board) > 0) { return true; } } else
+		 * { throw new Exception(" can't move someone elses stone"); } } // check if
+		 * stack is not empty , if (board.stateConfig.stackSto[m.player] > 0) { // check
+		 * if first row result = board.isMoveInStartingRow(m); if (!result) { throw new
+		 * Exception(" Invalid move not in start row" + m.toString()); } }
+		 */
+
 	}
 
 	/**
@@ -152,7 +173,7 @@ public class Board {
 		// bestimme den RichtungsVektor f�r den aktuellen Zug
 		Vector2 moveDir = new Vector2(0, 0);
 		int howManyFields = 1;
-		int jmp = this.getStone(move.x, move.y).canJump(this);
+		int jmp = this.getStoneAtKoord(move.x, move.y).canJump(this);
 		if (jmp > 0) {
 			howManyFields = jmp * 2; // if we can jump we have to jump.
 		}
@@ -217,9 +238,9 @@ public class Board {
 		Stone stone = null;
 
 		if (isMoveInStartingRow(move)) {
-			
-			if (getStoneAtKoord(move.x,move.y)== null ) {
-				
+
+			if (getStoneAtKoord(move.x, move.y) == null) {
+
 				// if it isnt then take a stone from the stack and place it
 				stone = getStoneFromStack(move.player);
 				stateConfig.ptr++;
@@ -233,11 +254,11 @@ public class Board {
 				byte player = (byte) move.player;
 				stone.player = player;
 
-			}else {
-				
-				moveStone(move);				
+			} else {
+
+				moveStone(move);
 			}
-		
+
 		} else {
 
 			// if the move isnt in the first row then just make the move
@@ -321,19 +342,13 @@ public class Board {
 	 * @param y
 	 * @returns null or Stone
 	 */
-	public Stone getStone(int x, int y) {
-		// respect board borders
-		if ((x >= 0 && y >= 0 && x < 7 && y < 7) == false)
-			return null;
-		// search for stone
-		int i = 0;
-		while (i < stateConfig.stones.length && (stateConfig.stones[i].x != x && stateConfig.stones[i].y != y)) {
-			i++;
-		}
-		if (i != stateConfig.stones.length)
-			return stateConfig.stones[i];
-		return null;
-	}
+	/*
+	 * public Stone getStone(int x, int y) { // respect board borders if ((x >= 0 &&
+	 * y >= 0 && x < 7 && y < 7) == false) return null; // search for stone int i =
+	 * 0; while (i < stateConfig.stones.length && (stateConfig.stones[i].x != x &&
+	 * stateConfig.stones[i].y != y)) { i++; } if (i != stateConfig.stones.length)
+	 * return stateConfig.stones[i]; return null; }
+	 */
 
 	/**
 	 * 
