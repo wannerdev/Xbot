@@ -128,7 +128,6 @@ public class Board {
 			}
 		}
 		return result;
-		
 	}
 
 	/**
@@ -222,7 +221,8 @@ public class Board {
 			//Stein wird aufjedenfall aus dem Stack platziert
 			//get a stone from stack
 			stone = stateConfig.stones[7*move.player];
-
+			
+			
 			assert (stone.player == move.player);
 			stateConfig.ptr++;
 			stone.inStack = false;

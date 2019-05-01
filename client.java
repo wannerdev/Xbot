@@ -29,9 +29,10 @@ public class client {
         
         	Board b = new Board();
         	GameTree tree = new GameTree();
+        	int x=0,y=0;
         	while(true) {
 	            Move move = client.receiveMove(); //Man bekommt auch den eigenen Zug
-	        	Move lastmove =  tree.bestMove(myNumber, b); //calculateOneMove(myNumber, b); 
+	        	Move lastmove =  new Move(myNumber,x,y);//tree.bestMove(myNumber, b); //calculateOneMove(myNumber, b); 
                 //ich bin dran
 	            if (move == null) {
 	            	if(myNumber == 0) {
@@ -40,7 +41,7 @@ public class client {
 	            			
             		}else {
 	            		// ansonsten rotiere das spielbrett f�r den entsprechenden Spieler       		
-		                client.sendMove(lastmove);
+		                client.sendMove(KoordHelper.rotate(myNumber, lastmove));
             			
             		}
 	            	/*else {
