@@ -20,9 +20,7 @@ public class Stone {
 	 * @return
 	 */
 	boolean isBlocked(Board bo) {		
-		Move dir = KoordHelper.playerToDirection(player);
-		
-	    
+		Move dir = KoordHelper.playerToDirection(player);	    
 		if (!inStack) {
 			// if im not in stack get my forward neigbor
 			Stone neighbor = bo.getStoneAtKoord((x+dir.x), (y+dir.y));
@@ -39,17 +37,15 @@ public class Stone {
 					if (farNeighbor != null) {
 						
 						return true;
-					}
-					
+					}					
 				}
-				
-				
 			}
 			
 		}
 		
 		return false;
 		//return !inStack||(bo.getStone((x+dir.x), (y+dir.y)) != null) && (bo.getStone((x+dir.x*2), (y+dir.y*2)) != null);
+
 	}
 	
 	/**

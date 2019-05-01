@@ -43,12 +43,9 @@ public class Board {
 		Stone[] myStones = this.getMyStones(player, conf);
 		for (Stone st : myStones) {
 			/// pr�fe ob der Stein im Stack ist
-			if (!st.inStack && !st.isBlocked(this)) {
+			if (!st.inStack ) { // !st.isBlocked(this)
 				// wenn nicht im stack und er nicht blockiert ist, dann f�ge ihn zu den
 				// M�glichen Z�gen
-				if (st.x > 6 && st.y > 6) {
-					throw new Exception("bounds");
-				}
 				Move move = new Move(player, st.x, st.y);
 				if (isValidMove(move, this)) {
 					result.add(move);
@@ -59,26 +56,27 @@ public class Board {
 		// TODO FIXME not working properly
 		// Add first row as possible moves
 		if (conf.stackSto[player] > 0) {
-			// falls ein Stein im Stack ist f�ge start reihe hinzu
-			Move m = new Move(player, 0, 0);
+			// falls ein Stein im Stack ist f�ge start reihe hinzu, wenn nicht durch gegner oder blockierten stein belegt
+			
 			for (int i = 0; i < 7; i++) {
+				Move m = new Move(player, 0, 0);
 				switch (m.player) {
-				case 0:
-					m.y = 0;
-					m.x = i;
-					break;
-				case 1:
-					m.x = 0;
-					m.y = i;
-					break;
-				case 2:
-					m.y = 6;
-					m.x = i;
-					break;
-				case 3:
-					m.x = 6;
-					m.y = i;
-					break;
+					case 0:
+						m.x = i;
+						m.y = 0;
+						break;
+					case 1:
+						m.x = 0;
+						m.y = i;
+						break;
+					case 2:
+						m.x = i;
+						m.y = 6;
+						break;
+					case 3:
+						m.x = 6;
+						m.y = i;
+						break;
 				}
 				if (spotIsFree(m.x, m.y, conf)) {
 					if (isValidMove(m, this)) {
@@ -105,6 +103,7 @@ public class Board {
 	 * @returns true if possible
 	 */
 	public static boolean isValidMove(Move m, Board board) throws Exception {
+
 
 		// first check if there is a stone on the coordinates
 		Stone stone = board.getStoneAtKoord(m.x, m.y);

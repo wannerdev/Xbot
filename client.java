@@ -55,6 +55,7 @@ public class client {
 					// baue Zug in meine spielfeldrepräsentation ein
 					b.makeMove(move);
 					System.out.println(" Anzahl steine: " + b.stateConfig.ptr);
+	            	System.out.println("Allmoves:"+b.calcFreeMoves(myNumber, b.stateConfig).toString());
 					System.out.println(b.stateConfig.toString());
 					System.out.println("MOVE: X = " + move.x + " || Y = " + move.y);
 
@@ -63,6 +64,7 @@ public class client {
 		} catch (Exception e) {
 			System.err.println("Exception: \n" + e.getLocalizedMessage());
 		}
+
 	}
 
 }
