@@ -76,7 +76,7 @@ public class Board {
 	 * @returns true if possible
 	 */
 	public static boolean isValidMove(Move m, Board board) throws Exception {
-		if ((m.x >= 0 && m.y >= 0 && m.x < 7 && m.y < 7) == false)throw new Exception("moveStone() Borders");
+		if ((m.x >= 0 && m.y >= 0 && m.x < 7 && m.y < 7) == false)throw new Exception("isValidMove() Borders");
 
 		// first check if there is a stone on the coordinates
 		Stone stone = board.getStoneAtKoord(m.x, m.y);
