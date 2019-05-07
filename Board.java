@@ -6,28 +6,18 @@ import java.util.List;
 import lenz.htw.sawhian.Move;
 
 public class Board {
-	Config stateConfig;
+	private Config stateConfig;
 
-	// set up the stones and assign them a player number
 	public Board() {
 		stateConfig = new Config();
+	}
 
-		for (int i = 0; i < stateConfig.stones.length; i++) {
-			stateConfig.stones[i] = new Stone((byte) -1, (byte) -1, (byte) 0);
-			stateConfig.stones[i].inStack = true;
-			if (i < 7) {
-				stateConfig.stones[i].player = 0;
+	public Config getStateConfig() {
+		return stateConfig;
+	}
 
-			} else if (i >= 7 && i < 14) {
-				stateConfig.stones[i].player = 1;
-
-			} else if (i >= 14 && i < 21) {
-				stateConfig.stones[i].player = 2;
-
-			} else if (i >= 21 && i < 28) {
-				stateConfig.stones[i].player = 3;
-			}
-		}
+	public void setStateConfig(Config stateConfig) {
+		this.stateConfig = stateConfig;
 	}
 
 	/**
@@ -38,7 +28,6 @@ public class Board {
 	 * @throws Exception
 	 */
 	public List<Move> calcFreeMoves(int player, Board board) throws Exception {
-		// Evtl ein Set nehmen?
 		List<Move> result = new ArrayList<Move>();
 
 		if (board.stateConfig.stackSto[player] > 0) {
@@ -65,9 +54,7 @@ public class Board {
 
 		Stone[] myStones = this.getMyStones(player, board.stateConfig);
 		for (Stone st : myStones) {
-			/// pr�fe ob der Stein im Stack ist
-			
-	
+			/// pr�fe ob der Stein im Stack ist	
 			if (!st.inStack) {
 				Move move = new Move(player, st.x, st.y);
 				if (isValidMove(move, board)) {
@@ -80,11 +67,6 @@ public class Board {
 
 	}
 
-	/*
-	 * Test what does the server do in
-	 * 
-	 * -x - ---
-	 */
 	/**
 	 * Unfinished TODO Test if correct
 	 * 
@@ -94,11 +76,12 @@ public class Board {
 	 * @returns true if possible
 	 */
 	public static boolean isValidMove(Move m, Board board) throws Exception {
+		if ((m.x >= 0 && m.y >= 0 && m.x < 7 && m.y < 7) == false)throw new Exception("moveStone() Borders");
 
 		// first check if there is a stone on the coordinates
 		Stone stone = board.getStoneAtKoord(m.x, m.y);
 		if (stone == null) {
-			// if there isnt at stone at this position check if its in the first row
+			// if there isn't at stone at this position check if its in the first row
 			if (!board.isMoveInStartingRow(m)) {
 				// if it isnt then it cant be a valid move
 				return false;
@@ -126,17 +109,6 @@ public class Board {
 
 		}
 
-		// if
-
-		/*
-		 * if (stone != null) { if (stone.player == m.player) { // If my own stone if
-		 * (!stone.isBlocked(board) || stone.canJump(board) > 0) { return true; } } else
-		 * { throw new Exception(" can't move someone elses stone"); } } // check if
-		 * stack is not empty , if (board.stateConfig.stackSto[m.player] > 0) { // check
-		 * if first row result = board.isMoveInStartingRow(m); if (!result) { throw new
-		 * Exception(" Invalid move not in start row" + m.toString()); } }
-		 */
-
 	}
 
 	/**
@@ -150,6 +122,7 @@ public class Board {
 	 * @param playerNumber
 	 * @param howManyFields
 	 * @param board
+	 * @throws Exception moveStone() Borders
 	 */
 	/*
 	 * Springend �ber eine beliebig lange Kette von abwechselnd nicht-eigenen
@@ -158,8 +131,9 @@ public class Board {
 	 * am Spielbrettrand mit einem nicht-eigenen Stein endet. -- wir gehen davon aus
 	 * das man immer die maximale Anzahl springt // Mail von Lenz als Best�tigung
 	 */
-	public void moveStone(Move move) {
+	public void moveStone(Move move) throws Exception {
 		// bestimme den RichtungsVektor f�r den aktuellen Zug
+			
 		Vector2 moveDir = new Vector2(0, 0);
 		int howManyFields = 1;
 		int jmp = this.getStoneAtKoord(move.x, move.y).canJump(this);
@@ -170,21 +144,21 @@ public class Board {
 		int y = move.y;
 
 		switch (move.player) {
-		case 0:
-			moveDir.y = 1 * howManyFields;
-			break;
-
-		case 1:
-			moveDir.x = 1 * howManyFields;
-			break;
-
-		case 2:
-			moveDir.y = -1 * howManyFields;
-			break;
-
-		case 3:
-			moveDir.x = -1 * howManyFields;
-			break;
+			case 0:
+				moveDir.y = 1 * howManyFields;
+				break;
+	
+			case 1:
+				moveDir.x = 1 * howManyFields;
+				break;
+	
+			case 2:
+				moveDir.y = -1 * howManyFields;
+				break;
+	
+			case 3:
+				moveDir.x = -1 * howManyFields;
+				break;
 		}
 
 		if (howManyFields != 0) {
@@ -195,7 +169,11 @@ public class Board {
 						// wenn wir den richtigen Stein haben, mach den Zug mit dem Stein
 						st.x += moveDir.x;
 						st.y += moveDir.y;
-						
+						//if(st.x >6 || st.y > 6) { //if stones off board do what?
+							//st.= true;
+							//st.x = -2;
+							//st.y = -2;
+						//}
 						break;
 					}
 				}
@@ -239,7 +217,6 @@ public class Board {
 			}
 
 		} else {
-
 			// if the move isnt in the first row then just make the move
 			moveStone(move);
 		}
@@ -251,6 +228,15 @@ public class Board {
 				return stateConfig.stones[i];
 		}
 		return null;
+	}
+	
+	int getScore(int player) {
+		int score = 0;
+		for (int i = player * 7; i < (player + 1) * 7; i++) {
+			if (stateConfig.stones[i].x == 7 || stateConfig.stones[i].y == 7)
+				score++;
+		}
+		return score;
 	}
 
 	// check if move is in starting row
@@ -333,7 +319,7 @@ public class Board {
 	 * 
 	 * @param x
 	 * @param y
-	 * @param board
+	 * @param config
 	 * @returns true if spot is free
 	 */
 	public static boolean spotIsFree(int x, int y, Config conf) {

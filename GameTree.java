@@ -11,7 +11,7 @@ public class GameTree {
 		return li.get(0);
 	}
 	
-	public Move bestMove(int playerNumber, Board b) throws Exception {
+	public Move randomMove(int playerNumber, Board b) throws Exception {
 
 		List<Move> myPossibleMoves = b.calcFreeMoves(playerNumber, b);
 		//System.out.println(myPossibleMoves.size());

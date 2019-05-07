@@ -45,7 +45,6 @@ public class Stone {
 		
 		return false;
 		//return !inStack||(bo.getStone((x+dir.x), (y+dir.y)) != null) && (bo.getStone((x+dir.x*2), (y+dir.y*2)) != null);
-
 	}
 	
 	/**
@@ -55,7 +54,7 @@ public class Stone {
 	 */
 	byte canJump(Board bo) {
 		Move dir = KoordHelper.playerToDirection(player);	
-		byte result=0;
+		byte result = 0;
 		//has one ahead and space behin
 		if((bo.getStoneAtKoord((x+dir.x), (y+dir.y)) != null) && bo.getStoneAtKoord((x+dir.x), (y+dir.y)).player !=this.player && (bo.getStoneAtKoord((x+dir.x*2), (y+dir.y*2)) == null)) {
 			result = 1;
@@ -68,17 +67,13 @@ public class Stone {
 		if(result ==2 &&(bo.getStoneAtKoord((x+dir.x*5), (y+dir.y*5)) != null)&& bo.getStoneAtKoord((x+dir.x), (y+dir.y)).player !=this.player && (bo.getStoneAtKoord((x+dir.x*6), (y+dir.y*6)) == null) ) {
 			result++;
 		}
-		return result;
-		
-		
-	}
-	
-	
+		return result;		
+	}	
 	
 	byte distanceToGoal(){
 		//switch()
 		Move dir = KoordHelper.playerToDirection(player);
-		if(dir.x !=0) {
+		if(dir.x != 0) {
 			return (byte) ((byte)7-this.x); 	
 		}
 		if(dir.y !=0) {
