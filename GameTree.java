@@ -11,6 +11,12 @@ public class GameTree {
 		return li.get(0);
 	}
 	
+	public Move MultiMax(int player, Board b) throws Exception{
+		MinMax alg = new MinMax(b);
+		return alg.run(player);
+	}
+	
+	
 	public Move randomMove(int playerNumber, Board b) throws Exception {
 
 		List<Move> myPossibleMoves = b.calcFreeMoves(playerNumber, b);

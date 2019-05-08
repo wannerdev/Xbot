@@ -24,7 +24,7 @@ public class client {
 		try {
 
 			String logoh = "cybran";
-			BufferedImage logo = ImageIO.read(new File("xbot/" + logoh + ".png"));
+			BufferedImage logo = ImageIO.read(new File("res/" + logoh + ".png"));
 			Integer num = (int) (Math.random() * 50);
 			NetworkClient client = new NetworkClient(null, "XBot" + num.toString() + "000", logo);
 			int myNumber = client.getMyPlayerNumber();
@@ -37,6 +37,7 @@ public class client {
 				Move move = client.receiveMove(); // Man bekommt auch den eigenen Zug
 				System.out.println("Allmoves:" + b.calcFreeMoves(myNumber, b).toString());
 				Move lastmove = tree.randomMove(myNumber, b); 
+				if(myNumber ==0)tree.MultiMax(myNumber, b);
 				
 				// ich bin dran
 				if (move == null) {
@@ -52,6 +53,7 @@ public class client {
 				}
 			}
 		} catch (Exception e) {
+			e.getStackTrace();
 			System.err.println("Exception: \n" + e.getLocalizedMessage());
 		}
 	}

@@ -33,15 +33,14 @@ public class MinMax {
 		List<Move> posMoves = board.calcFreeMoves(player, board);
 		if (depth == 0 || posMoves == null)
 			return rate(player);
-		//Board cache;
 		Config cache;
 		int maxWert = alpha; //ab
-		//Min as the next player in line 
+		//Max as the next player in line 
 		player = nextPlayer(player);
 		for (Move move : posMoves) {
 			cache = board.getStateConfig().clone();
 			board.makeMove(move);
-			int wert = min(player, depth - 1, maxWert, beta);	
+			int wert = max(player, depth - 1, maxWert, beta);	
 			board.setStateConfig(cache); //macheZugRueckgaengig();
 			
 			if (wert > maxWert) {
