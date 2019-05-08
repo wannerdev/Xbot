@@ -53,7 +53,7 @@ public class client {
 				}
 			}
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			System.err.println("Exception: \n" + e.getLocalizedMessage());
 		}
 	}

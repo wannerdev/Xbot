@@ -1,5 +1,6 @@
 package Xbot;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lenz.htw.sawhian.Move;
@@ -10,6 +11,9 @@ public class MinMax {
 	private int targetDepth = 2;
 	public int[] alive;
 	public Board board; 
+	public final int maxsum=25;
+	public final int maxp=25;
+	
 	
 //	public int weight1;
 //	public int weight2;
@@ -21,8 +25,9 @@ public class MinMax {
 	}
 			
 	public Move run(int player) throws Exception{
-		int rating = 0;
-		rating = max(player, targetDepth,Integer.MIN_VALUE, Integer.MAX_VALUE);
+		int[] rating = new int[4];
+		//Multiply by 3 because we are 4 players
+		rating = maxN(player, targetDepth*3);
 		
 		System.out.println("Player"+player+", Rating of the move:" +rating);
 		
@@ -30,34 +35,75 @@ public class MinMax {
 	}
 
 
-	public int maxN(int player, int depth, int alpha) throws Exception {
+	public int[] maxN(int player, int depth) throws Exception {
 		int ratings[]= new int[4];
-		int secondPl = nextPlayer(player);
-		int thirdPl = nextPlayer(secondPl);
-		int fourthPl = nextPlayer(thirdPl);
+		// get all free moves
 		List<Move> posMoves = board.calcFreeMoves(player, board);
+		// if I am the final node, evaluate my Configuration and return the rating
 		if (depth == 0 || posMoves == null) {
-			ratings = rateAll();
+			ratings = rateAll(player);
+			return ratings;
 		}
 		Config cache;
+		// make a List/ array for all the ratings of the possible nodes
+		ArrayList<int[]> ratingList = new ArrayList<int []>();
+		int j=0;
+
+		// iterate through all possible moves
 		for (Move move : posMoves) {
+		// save the board to the cache
 			cache = board.getStateConfig().clone();
+			board.setStateConfig(cache);
+			// make the move to create new config / Node
 			board.makeMove(move);
-			ratings = rateAll();
-			//Maybe Maxsum value different
-			if(ratings[secondPl] == Integer.MAX_VALUE || ratings[thirdPl] == Integer.MAX_VALUE  || ratings[fourthPl] == Integer.MAX_VALUE ) {
-				
+			// check to see if Node is Terminal
+			ratings = rateAll(player);
+			if(ratings[player]==Integer.MAX_VALUE ){
+				//savedMove = move;
+				return ratings;
+			}else if(ratings[player]==Integer.MIN_VALUE ) {
+				//cut tree if possible
+			    return ratings;
 			}
-			int wert = maxN(player, depth - 1, alpha);	
-			board.setStateConfig(cache); //macheZugRueckgaengig();
-			//Math.max(a, b)
-			//if() {
-			if (depth == targetDepth)
+			ratings = maxN(nextPlayer(player), depth - 1);
+	        // If I have finished searching my child Nodes I take the final evaluation for this Node
+	        ratingList.add(ratings);
+	        /// if i am at the root node
+	        if (depth == targetDepth*3){
+	        if(ratings[player] > ratingList.get(j)[player]){
 				savedMove = move;
-		}		
-		return 0;
+			}
+	        }	        
+	        // reset config
+			board.setStateConfig(cache); //macheZugRueckgaengig();	
+			j++;	
+		}
+		int[] bestRating = getBestRating(player,ratingList);
+		
+		return bestRating;
 	}
 	
+	private int getOurBestMove(int player,ArrayList<int[]> list) {
+		int cache=0;
+		for(int[] item :list){
+			if(item [player] >= cache){
+				cache = item [player];
+			}
+		}
+		return cache;
+	}
+	
+	private static int[] getBestRating(int player,ArrayList<int[]> list) {
+		int[] cache = new int[4];
+		for(int[] item :list){
+			if(item [player] >= cache[player]){
+				cache = item;
+			}
+		}
+		return cache;
+	}
+	
+/*
 	int max(int player, int depth, int alpha, int beta) throws Exception {
 		// get all free  moves for this configuration
 		List<Move> posMoves = board.calcFreeMoves(player, board);
@@ -125,9 +171,9 @@ public class MinMax {
 		}
 		return minWert;
 	}
-
+*/
 	int nextPlayer(int player) {
-		if(player < 4) {
+		if(player < 3) {
 			player++;
 		}else {
 			player=0;
@@ -136,12 +182,28 @@ public class MinMax {
 	}
 	
 
-	int[] rateAll(){
+	int[] rateAll(int player){
 		int ratings[]= new int[4];
 		ratings[0]=rate(0);
 		ratings[1]=rate(1);
 		ratings[2]=rate(2);
 		ratings[3]=rate(3);
+		for ( int i = 0 ; i< 4 ; i++){
+			if (ratings[i] == 7){
+				// if Terminal check for the winner
+				if(ratings[player] == maxp){
+				// if we won save the move and break  ??
+					//savedMove = move;
+					ratings[player] = Integer.MAX_VALUE;
+					return ratings;
+					
+				}else{
+				// if we lost make sure to rate this config the worst possible
+					ratings[player] = Integer.MIN_VALUE;
+					return ratings;
+				}			
+			}
+		}
 		return ratings;
 	}
 	
@@ -173,7 +235,8 @@ public class MinMax {
 				return 0; //Draw
 			}
 		}
-		return  freeStones+jumps;
+		//TODO change
+		return  bo.getScore(player);
 	 }
 	
 }
