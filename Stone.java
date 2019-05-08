@@ -7,6 +7,7 @@ public class Stone {
 	//Coords absolute, decided 22.04
 	byte x, y, player;
 	public boolean inStack = true;
+	public boolean offField = false;
 	
 	Stone(byte x, byte y, byte player){
 		this.x = x;

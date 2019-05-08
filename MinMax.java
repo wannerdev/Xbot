@@ -29,7 +29,9 @@ public class MinMax {
 		return savedMove;
 	}
 
+	//
 	int max(int player, int depth, int alpha, int beta) throws Exception {
+		// get all free  moves for this configuration
 		List<Move> posMoves = board.calcFreeMoves(player, board);
 		if (depth == 0 || posMoves == null)
 			return rate(player);

@@ -169,11 +169,11 @@ public class Board {
 						// wenn wir den richtigen Stein haben, mach den Zug mit dem Stein
 						st.x += moveDir.x;
 						st.y += moveDir.y;
-						//if(st.x >6 || st.y > 6) { //if stones off board do what?
-							//st.= true;
-							//st.x = -2;
-							//st.y = -2;
-						//}
+						if(st.x >6 || st.y > 6) { //if stones off board do what?
+							st.offField= true;
+							st.x = -2;
+							st.y = -2;
+						}
 						break;
 					}
 				}

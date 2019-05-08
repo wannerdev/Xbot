@@ -24,7 +24,7 @@ public class client {
 		try {
 
 			String logoh = "cybran";
-			BufferedImage logo = ImageIO.read(new File("res/" + logoh + ".png"));
+			BufferedImage logo = ImageIO.read(new File("src/Xbot/" +logoh + ".png"));
 			Integer num = (int) (Math.random() * 50);
 			NetworkClient client = new NetworkClient(null, "XBot" + num.toString() + "000", logo);
 			int myNumber = client.getMyPlayerNumber();
