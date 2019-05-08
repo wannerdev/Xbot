@@ -29,7 +29,35 @@ public class MinMax {
 		return savedMove;
 	}
 
-	//
+
+	public int maxN(int player, int depth, int alpha) throws Exception {
+		int ratings[]= new int[4];
+		int secondPl = nextPlayer(player);
+		int thirdPl = nextPlayer(secondPl);
+		int fourthPl = nextPlayer(thirdPl);
+		List<Move> posMoves = board.calcFreeMoves(player, board);
+		if (depth == 0 || posMoves == null) {
+			ratings = rateAll();
+		}
+		Config cache;
+		for (Move move : posMoves) {
+			cache = board.getStateConfig().clone();
+			board.makeMove(move);
+			ratings = rateAll();
+			//Maybe Maxsum value different
+			if(ratings[secondPl] == Integer.MAX_VALUE || ratings[thirdPl] == Integer.MAX_VALUE  || ratings[fourthPl] == Integer.MAX_VALUE ) {
+				
+			}
+			int wert = maxN(player, depth - 1, alpha);	
+			board.setStateConfig(cache); //macheZugRueckgaengig();
+			//Math.max(a, b)
+			//if() {
+			if (depth == targetDepth)
+				savedMove = move;
+		}		
+		return 0;
+	}
+	
 	int max(int player, int depth, int alpha, int beta) throws Exception {
 		// get all free  moves for this configuration
 		List<Move> posMoves = board.calcFreeMoves(player, board);
@@ -107,6 +135,16 @@ public class MinMax {
 		return player;
 	}
 	
+
+	int[] rateAll(){
+		int ratings[]= new int[4];
+		ratings[0]=rate(0);
+		ratings[1]=rate(1);
+		ratings[2]=rate(2);
+		ratings[3]=rate(3);
+		return ratings;
+	}
+	
 	int rate(int player){
 		int freeStones = 0;
 		int jumps = 0;
@@ -121,7 +159,7 @@ public class MinMax {
 		if(freeStones == 0 ) {
 			int secondPlayer = nextPlayer(player);
 			int thirdPlayer = nextPlayer(secondPlayer);
-			int fourthPlayer = nextPlayer(secondPlayer);
+			int fourthPlayer = nextPlayer(thirdPlayer);
 			
 			if(bo.getScore(player) < bo.getScore(secondPlayer) || bo.getScore(player) < bo.getScore(thirdPlayer) || bo.getScore(player) < bo.getScore(fourthPlayer) ) {
 				//if anybody has a higher score
