@@ -170,7 +170,7 @@ public class Board {
 						st.x += moveDir.x;
 						st.y += moveDir.y;
 						if(st.x >6 || st.y > 6) { //if stones off board do what?
-							st.offField= true;
+							st.isScored = true;
 							st.x = -2;
 							st.y = -2;
 						}
@@ -197,19 +197,22 @@ public class Board {
 		if (isMoveInStartingRow(move)) {
 
 			if (getStoneAtKoord(move.x, move.y) == null) {
-
-				// if it isnt then take a stone from the stack and place it
+				
+				// if it isn't then take a stone from the stack and place it
 				stone = getStoneFromStack(move.player);
-				stone.inStack = false;
-				stateConfig.stackSto[move.player]--;
-				stateConfig.ptr++;
-
-				int y = move.y;
-				int x = move.x;
-				stone.x = (byte) x;
-				stone.y = (byte) y;
-				byte player = (byte) move.player;
-				stone.player = player;
+				//if we have a stone in stack
+				//if(stone !=null) {
+					stone.inStack = false;
+					stateConfig.stackSto[move.player]--;
+					stateConfig.ptr++;
+	
+					int y = move.y;
+					int x = move.x;
+					stone.x = (byte) x;
+					stone.y = (byte) y;
+					byte player = (byte) move.player;
+					stone.player = player;
+				//}
 
 			} else {
 

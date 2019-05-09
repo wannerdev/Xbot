@@ -13,7 +13,13 @@ public class GameTree {
 	
 	public Move MultiMax(int player, Board b) throws Exception{
 		MinMax alg = new MinMax(b.getStateConfig().clone());
-		return alg.run(player);
+		Move m = alg.run(player);
+		//If our Alg produces invalid moves
+		if(!Board.isValidMove(m, b)) {
+			System.err.println("MaxN produces invalid move");
+			calculateOneMove(player, b);
+		}
+		return m;
 	}
 	
 	
