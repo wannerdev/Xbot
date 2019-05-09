@@ -37,7 +37,7 @@ public class client {
 				Move move = client.receiveMove(); // Man bekommt auch den eigenen Zug
 				System.out.println("Allmoves:" + b.calcFreeMoves(myNumber, b).toString());
 				Move lastmove = tree.randomMove(myNumber, b); 
-				if(myNumber ==0)tree.MultiMax(myNumber, b);
+				if(myNumber == 0)tree.MultiMax(myNumber, b);
 				
 				// ich bin dran
 				if (move == null) {

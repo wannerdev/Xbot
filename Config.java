@@ -61,7 +61,7 @@ class Config implements Cloneable {
 		c.ptr = this.ptr;
 		
 		for(int i=0; i< stones.length; i++) {
-			c.stones[i] = this.stones[i];
+			c.stones[i] = this.stones[i].clone();
 		}
 		for(int i=0; i< stackSto.length; i++) {
 			c.stackSto[i] = this.stackSto[i];

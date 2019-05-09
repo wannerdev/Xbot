@@ -200,9 +200,9 @@ public class Board {
 
 				// if it isnt then take a stone from the stack and place it
 				stone = getStoneFromStack(move.player);
-				stateConfig.ptr++;
 				stone.inStack = false;
 				stateConfig.stackSto[move.player]--;
+				stateConfig.ptr++;
 
 				int y = move.y;
 				int x = move.x;

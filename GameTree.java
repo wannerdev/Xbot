@@ -12,7 +12,7 @@ public class GameTree {
 	}
 	
 	public Move MultiMax(int player, Board b) throws Exception{
-		MinMax alg = new MinMax(b);
+		MinMax alg = new MinMax(b.getStateConfig().clone());
 		return alg.run(player);
 	}
 	

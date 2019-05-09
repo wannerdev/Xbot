@@ -2,7 +2,7 @@ package Xbot;
 
 import lenz.htw.sawhian.Move;
 
-public class Stone {
+public class Stone implements Cloneable {
 
 	//Coords absolute, decided 22.04
 	byte x, y, player;
@@ -81,5 +81,18 @@ public class Stone {
 			return (byte) ((byte)7-this.y);			
 		}
 		return 7;
+	}
+	
+	public Stone clone() {
+		Stone st = new Stone((byte)-1,(byte)-1,(byte)-1);
+		st.inStack = this.inStack;
+		st.offField = this.offField;
+		st.player = this.player;
+		st.x = this.x;
+		st.y = this.y;
+		
+		return st;
+		
+		
 	}
 }
