@@ -17,7 +17,7 @@ public class GameTree {
 		//If our Alg produces invalid moves
 		if(!Board.isValidMove(m, b)) {
 			System.err.println("MaxN produces invalid move");
-			calculateOneMove(player, b);
+			m=calculateOneMove(player, b);
 		}
 		return m;
 	}

@@ -57,7 +57,7 @@ public class client {
 					System.out.println("MOVE: X = " + move.x + " || Y = " + move.y);
 				}
 			}
-			//TODO recognise valid game end.
+			//TODO recognize valid game end.
 			//save();
 		} catch (Exception e) {
 			save();

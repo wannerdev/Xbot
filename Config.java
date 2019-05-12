@@ -40,7 +40,21 @@ class Config implements Cloneable {
 	        	boolean isthere=false;
 	    		for(Stone st :stones) {
 		            if (i == st.y && j == st.x) {
-		    			rep+=" X";
+		            	switch(st.player) {
+		            	case 0: 
+			    			rep+=" X";
+			    			break;
+		            	case 1: 
+			    			rep+=" Y";
+			    			break;
+		            	case 2: 
+			    			rep+=" Z";
+			    			break;
+		            	case 3: 
+			    			rep+=" C";
+			    			break;
+		            		
+		            	}
 		                isthere=true;
 		                break;
 		            }
