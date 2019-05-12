@@ -204,7 +204,9 @@ public class Board {
 				// if it isn't then take a stone from the stack and place it
 				stone = getStoneFromStack(move.player);
 				// if we have a stone in stack
-				// if(stone !=null) {
+				if(stone ==null) {
+					throw new Exception("Probably something with the board representation, no stone in stack");
+				}
 				stone.inStack = false;
 				stateConfig.stackSto[move.player]--;
 				stateConfig.ptr++;
@@ -233,7 +235,7 @@ public class Board {
 			if (stateConfig.stones[i].inStack)
 				return stateConfig.stones[i];
 		}
-		System.err.println("getStoneFromStack player"+player+"\n config:\n "+stateConfig.toString());
+		//System.err.println("getStoneFromStack player"+player+"\n config:\n "+stateConfig.toString());
 		return null;
 	}
 

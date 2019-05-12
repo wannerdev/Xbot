@@ -51,10 +51,12 @@ class Config implements Cloneable {
 	        }
 			rep +="\n";
 		}
-		String attr="";//if needed change to attr2
-		String attr2="Config [stones=" + Arrays.toString(stones) + "\n, stackSto=" + Arrays.toString(stackSto) + ", ptr=" + ptr
+		return rep+"\n";
+	}
+
+	public String defaultToString() {
+		return "Config [stones=" + Arrays.toString(stones) + "\n, stackSto=" + Arrays.toString(stackSto) + ", ptr=" + ptr
 				+ "]";
-		return rep+"\n"+attr2;
 	}
 	
 	@Override

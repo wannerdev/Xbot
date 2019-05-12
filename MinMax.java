@@ -53,7 +53,7 @@ public class MinMax {
 		for (Move move : posMoves) {
 			// save the board to the cache
 			cache = board.getStateConfig().clone();
-			//board.setStateConfig(cache);
+			
 			// make the move to create new config / Node
 			board.makeMove(move);
 			// check to see if Node is Terminal
@@ -174,66 +174,3 @@ public class MinMax {
 	}
 
 }
-
-/**
- * Basically like wikipedia, except player number is increased
- * 
- * @param player
- * @param depth
- * @param alpha
- * @param beta
- * @return
- *//*
-	 * int NegaMaxAB(int player, int depth, int alpha, int beta) { List<Move>
-	 * posMoves = copyBoard.calcFreeMoves(player,copyBoard); if (depth == 0 ||
-	 * posMoves == null) return rate2Pl(player); int maxWert = alpha; Board cache;
-	 * for (Move move : posMoves) { cache = copyBoard.clone();
-	 * copyBoard.update(move); int wert = -NegaMaxAB(-player, depth-1, -beta,
-	 * -maxWert); copyBoard = cache; if (wert > maxWert) { maxWert = wert; if
-	 * (maxWert >= beta) break; if (depth == targetDepth) savedMove = move; } }
-	 * return maxWert; }
-	 * 
-	 * /* int AlphaBeta(int depth, int alpha, int beta) { if (depth == 0) return
-	 * rate(); boolean PVgefunden = false; int best = Integer.MIN_VALUE; List<Move>
-	 * posMoves =
-	 * CalcGameTree.calcFreeMoves(nextPlayer(this.copyBoard.playersDraw),copyBoard);
-	 * while (posMoves.size() >0) { Board cache = copyBoard.clone();
-	 * copyBoard.update(posMoves.get(0)); int wert; if (PVgefunden) { wert =
-	 * -AlphaBeta(depth-1, -alpha-1, -alpha); if (wert > alpha && wert < beta) {
-	 * wert = -AlphaBeta(depth-1, -beta, -wert); } } else { wert =
-	 * -AlphaBeta(depth-1, -beta, -alpha); } copyBoard = cache; if (wert > best) {
-	 * if (wert >= beta) { return wert; } best = wert; if (wert > alpha) { alpha =
-	 * wert; PVgefunden = true; } } } return best; } }
-	 */
-/*
- * int max(int player, int depth, int alpha, int beta) throws Exception { // get
- * all free moves for this configuration List<Move> posMoves =
- * board.calcFreeMoves(player, board); if (depth == 0 || posMoves == null)
- * return rate(player); Config cache; int maxWert = alpha; //ab //Max as the
- * next player in line player = nextPlayer(player); for (Move move : posMoves) {
- * cache = board.getStateConfig().clone(); board.makeMove(move); int wert =
- * max(player, depth - 1, maxWert, beta); board.setStateConfig(cache);
- * //macheZugRueckgaengig();
- * 
- * if (wert > maxWert) { maxWert = wert; if(maxWert >= beta )break; //ab if
- * (depth == targetDepth) savedMove = move; } } return maxWert; }
- * 
- * private int min(int player, int depth, int alpha, int beta) throws Exception
- * { List<Move> posMoves = board.calcFreeMoves(player, board); if (depth == 0 ||
- * posMoves == null) return rate(player); //Board cache; Config cache; int
- * minWert = beta; player = nextPlayer(player); for (Move move : posMoves) {
- * cache = board.getStateConfig().clone(); board.makeMove(move); int wert = 0;
- * wert = minMin(player, depth - 1, minWert, beta); board.setStateConfig(cache);
- * //macheZugRueckgaengig(); if (wert < minWert) { minWert = wert; } } return
- * minWert; }
- * 
- * private int minMin(int player, int depth, int alpha, int beta) throws
- * Exception { //NOT List<Move> posMoves = board.calcFreeMoves(player, board);
- * if (depth == 0 || posMoves == null) return rate(player); //Board cache;
- * Config cache; int minWert = Integer.MAX_VALUE; player = nextPlayer(player);
- * for (Move move : posMoves) { cache = board.getStateConfig().clone();
- * board.makeMove(move); int wert = 0; wert = max(player, depth - 1, alpha,
- * minWert); board.setStateConfig(cache); //macheZugRueckgaengig();
- * 
- * if (wert < minWert) { minWert = wert; } } return minWert; }
- */
