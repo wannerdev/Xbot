@@ -1,5 +1,6 @@
 package Xbot;
 
+import java.util.Arrays;
 
 class Config implements Cloneable {
 	Stone stones[] = new Stone[28];
@@ -48,11 +49,12 @@ class Config implements Cloneable {
 	    			rep+=" .";
 	            }
 	        }
-			rep+="\n";
+			rep +="\n";
 		}
-		return rep;
-		//return "Config [stones=" + Arrays.toString(stones) + ", stackSto=" + Arrays.toString(stackSto) + ", ptr=" + ptr
-		//		+ "]";
+		String attr="";//if needed change to attr2
+		String attr2="Config [stones=" + Arrays.toString(stones) + "\n, stackSto=" + Arrays.toString(stackSto) + ", ptr=" + ptr
+				+ "]";
+		return rep+"\n"+attr2;
 	}
 	
 	@Override

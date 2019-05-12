@@ -34,7 +34,7 @@ public class GameTree {
 			return myPossibleMoves.get(moveIndex);
 
 		} else {
-			throw new Exception("myPossibleMoves.size() <0 WTF ");
+			throw new Exception("myPossibleMoves.size() <0 Maybe Game Over? ");
 		}
 	}
 }

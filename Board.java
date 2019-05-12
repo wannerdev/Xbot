@@ -31,7 +31,8 @@ public class Board {
 		List<Move> result = new ArrayList<Move>();
 
 		if (board.stateConfig.stackSto[player] > 0) {
-			// falls ein Stein im Stack ist f�ge start reihe hinzu, wenn nicht durch gegner
+			// falls ein Stein im Stack ist f�ge start reihe hinzu, wenn nicht durch
+			// gegner
 			// oder blockierten stein belegt
 
 			for (int i = 0; i < 7; i++) {
@@ -54,7 +55,7 @@ public class Board {
 
 		Stone[] myStones = this.getMyStones(player, board.stateConfig);
 		for (Stone st : myStones) {
-			/// pr�fe ob der Stein im Stack ist	
+			/// pr�fe ob der Stein im Stack ist
 			if (!st.inStack) {
 				Move move = new Move(player, st.x, st.y);
 				if (isValidMove(move, board)) {
@@ -76,7 +77,8 @@ public class Board {
 	 * @returns true if possible
 	 */
 	public static boolean isValidMove(Move m, Board board) throws Exception {
-		if ((m.x >= 0 && m.y >= 0 && m.x < 7 && m.y < 7) == false)return false;//throw new Exception("isValidMove() Borders");
+		if ((m.x >= 0 && m.y >= 0 && m.x < 7 && m.y < 7) == false)
+			return false;// throw new Exception("isValidMove() Borders");
 
 		// first check if there is a stone on the coordinates
 		Stone stone = board.getStoneAtKoord(m.x, m.y);
@@ -122,7 +124,8 @@ public class Board {
 	 * @param playerNumber
 	 * @param howManyFields
 	 * @param board
-	 * @throws Exception moveStone() Borders
+	 * @throws Exception
+	 *             moveStone() Borders
 	 */
 	/*
 	 * Springend �ber eine beliebig lange Kette von abwechselnd nicht-eigenen
@@ -133,7 +136,7 @@ public class Board {
 	 */
 	public void moveStone(Move move) throws Exception {
 		// bestimme den RichtungsVektor f�r den aktuellen Zug
-			
+
 		Vector2 moveDir = new Vector2(0, 0);
 		int howManyFields = 1;
 		int jmp = this.getStoneAtKoord(move.x, move.y).canJump(this);
@@ -144,21 +147,21 @@ public class Board {
 		int y = move.y;
 
 		switch (move.player) {
-			case 0:
-				moveDir.y = 1 * howManyFields;
-				break;
-	
-			case 1:
-				moveDir.x = 1 * howManyFields;
-				break;
-	
-			case 2:
-				moveDir.y = -1 * howManyFields;
-				break;
-	
-			case 3:
-				moveDir.x = -1 * howManyFields;
-				break;
+		case 0:
+			moveDir.y = 1 * howManyFields;
+			break;
+
+		case 1:
+			moveDir.x = 1 * howManyFields;
+			break;
+
+		case 2:
+			moveDir.y = -1 * howManyFields;
+			break;
+
+		case 3:
+			moveDir.x = -1 * howManyFields;
+			break;
 		}
 
 		if (howManyFields != 0) {
@@ -169,7 +172,7 @@ public class Board {
 						// wenn wir den richtigen Stein haben, mach den Zug mit dem Stein
 						st.x += moveDir.x;
 						st.y += moveDir.y;
-						if(st.x >6 || st.y > 6) { //if stones off board do what?
+						if (st.x > 6 || st.y > 6) { // if stones off board do what?
 							st.isScored = true;
 							st.x = -2;
 							st.y = -2;
@@ -179,7 +182,7 @@ public class Board {
 				}
 			}
 
-		} 
+		}
 	}
 
 	/**
@@ -197,22 +200,22 @@ public class Board {
 		if (isMoveInStartingRow(move)) {
 
 			if (getStoneAtKoord(move.x, move.y) == null) {
-				
+
 				// if it isn't then take a stone from the stack and place it
 				stone = getStoneFromStack(move.player);
-				//if we have a stone in stack
-				//if(stone !=null) {
-					stone.inStack = false;
-					stateConfig.stackSto[move.player]--;
-					stateConfig.ptr++;
-	
-					int y = move.y;
-					int x = move.x;
-					stone.x = (byte) x;
-					stone.y = (byte) y;
-					byte player = (byte) move.player;
-					stone.player = player;
-				//}
+				// if we have a stone in stack
+				// if(stone !=null) {
+				stone.inStack = false;
+				stateConfig.stackSto[move.player]--;
+				stateConfig.ptr++;
+
+				int y = move.y;
+				int x = move.x;
+				stone.x = (byte) x;
+				stone.y = (byte) y;
+				byte player = (byte) move.player;
+				stone.player = player;
+				// }
 
 			} else {
 
@@ -230,9 +233,10 @@ public class Board {
 			if (stateConfig.stones[i].inStack)
 				return stateConfig.stones[i];
 		}
+		System.err.println("getStoneFromStack player"+player+"\n config:\n "+stateConfig.toString());
 		return null;
 	}
-	
+
 	int getScore(int player) {
 		int score = 0;
 		for (int i = player * 7; i < (player + 1) * 7; i++) {

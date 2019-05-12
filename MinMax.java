@@ -53,7 +53,7 @@ public class MinMax {
 		for (Move move : posMoves) {
 			// save the board to the cache
 			cache = board.getStateConfig().clone();
-			board.setStateConfig(cache);
+			//board.setStateConfig(cache);
 			// make the move to create new config / Node
 			board.makeMove(move);
 			// check to see if Node is Terminal

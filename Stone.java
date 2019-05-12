@@ -97,4 +97,10 @@ public class Stone implements Cloneable {
 		
 		
 	}
+
+	@Override
+	public String toString() {
+		return "Stone [x=" + x + ", y=" + y + ", player=" + player + ", inStack=" + inStack + ", isScored=" + isScored
+				+ "]";
+	}
 }
