@@ -12,20 +12,24 @@ import javax.imageio.ImageIO;
 import lenz.htw.sawhian.Move;
 import lenz.htw.sawhian.net.*;
 
-public class client {
+public class client implements Runnable{
 
-	static float weight_x = 0.5f, weight_y = 0.25f, weight_z = 0.25f; //arbitrary default values
-
+	float weight_x = 0.5f, weight_y = 0.25f, weight_z = 0.25f; //arbitrary default values
+	
+	// Laptop Auflösung server
 	// java -Djava.library.path=C:\Users\Johannes\Dropbox\Java\sawhian\lib\native
-	// -jar C:\Users\Johannes\Dropbox\Java\sawhian\sawhian.jar 4 1600 900
-	// Laptop auflÃ¶sung server
+	// -jar C:\Users\Johannes\Dropbox\Java\sawhian\sawhian.jar 4 1600 900	
 	// Desktop
 	// java -Djava.library.path=D:\Wichtig\Programmieren\Java\Xbot\sawhian\lib\native -jar D:\Wichtig\Programmieren\Java\Xbot\sawhian\sawhian.jar 4 1600 900
 	
-	// Man bekommt nur die position des steines nicht das Ziel da der Stein ja nur
-	// in eine Richtung kann
-	public static void main(String[] args) {
-			load();
+	public client(Float weight_x, Float weight_y , Float weight_z) {
+		this.weight_x = weight_x;
+		this.weight_y = weight_y;
+		this.weight_z = weight_z;
+	}
+
+	@Override
+	public void run() {
 			Board b = new Board();
 		try {
 			String logoh = "cybran";
@@ -39,9 +43,8 @@ public class client {
 			int x = 0, y = 0;
 			while (true) {
 				Move move = client.receiveMove(); // Man bekommt auch den eigenen Zug
-				System.out.println("Allmoves:" + b.calcFreeMoves(myNumber, b).toString());
 				
-				//problem when  my next move is only possible by the player before me enabling(unblocking) a move
+				//problem when  my next move is only possible by the player before me enabling() a move
 				// ich bin dran
 				if (move == null) {
 					Move lastmove = tree.randomMove(myNumber, b);
@@ -49,8 +52,8 @@ public class client {
 						lastmove  = tree.MultiMax(myNumber, b);
 					}
 					client.sendMove(lastmove);
-					// x++;
 				} else {
+					System.out.println("Allmoves:" + b.calcFreeMoves(myNumber, b).toString());
 					// baue Zug in meine spielfeldrepräsentation ein
 					b.makeMove(move);
 					System.out.println(" Anzahl steine: " + b.getStateConfig().ptr);
@@ -60,50 +63,14 @@ public class client {
 				}
 			}
 			//TODO recognize valid game end.
-			//save();
 		}catch (RuntimeException e) {
 			e.printStackTrace();			
-			System.err.println("Maybe GameOver Scores:"+b.getScores());
+			System.err.println("GameOver Scores:"+b.getScores());
 		} catch (Exception e) {
-			save();
 			e.printStackTrace();
 			System.err.println("Exception: \n" + e.getLocalizedMessage());
 		}
 	}
 
-	
 
-	private static void load() {
-		Scanner scanner=null;
-		try {
-			
-			scanner = new Scanner(new File("weights.csv"));
-	        scanner.useDelimiter(";");
-	        while(scanner.hasNext()){
-	            weight_x = Integer.valueOf(scanner.next());
-	            weight_y = Integer.valueOf(scanner.next());
-	            weight_z = Integer.valueOf(scanner.next());
-	        }
-	        scanner.close();
-		} catch (FileNotFoundException e1) {
-			// do nothing use standards
-		}		
-	}
-
-	public static void save() {
-		try {
-			PrintWriter pw = new PrintWriter(new File("weights.csv"));
-	        StringBuilder sb = new StringBuilder();
-	        sb.append(weight_x);
-	        sb.append(';');
-	        sb.append(weight_y);
-	        sb.append(';');
-	        sb.append(weight_z);
-	        sb.append(';');
-	        sb.append('\n');
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			throw new AssertionError();
-		}
-	}
 }

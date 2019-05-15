@@ -16,8 +16,7 @@ public class Select {
 	//Not WORKING ATM
 	
 	public static void main(String[] args) {			
-		load();
-		
+		load();		
 		
 		//Candidates
 		//Set<Integer[]> mutatedCand = new HashSet<Integer[]>();
@@ -31,12 +30,14 @@ public class Select {
 			candidates.add(new Float[] {(float) ((int)Math.random()*100),(float) ((int)Math.random()*100),(float) ((int)Math.random()*100)});
 		}
 		Iterator<Float[]> it = candidates.iterator();
-		
+		//server
 		Process proc = null;
         while(true) {
+        	//clients
         	Thread t1;
     		Thread t2;
     		Thread t3;
+    		Thread t4;
     		//evaluation
     		int counter = 0;
     		String again = "y";
@@ -57,37 +58,34 @@ public class Select {
 	        		if(it.hasNext() == false)break;
 	        		Float[] cand3 = it.next();
 	        		
-	        		client[] gc = new client[3];
+	        		client[] gc = new client[4];
 	        		gc[0] = new client(cand1[0],cand1[1],cand1[2]);
 	        		gc[1] = new client(cand2[0],cand2[1],cand2[2]);
 	        		gc[2] = new client(cand3[0],cand3[1],cand3[2]);
+	        		gc[3] = new client(cand3[0],cand3[1],cand3[2]);
 	
 	        		t1 = new Thread(gc[0]);
 	        		t2 = new Thread(gc[1]);
 	        		t3 = new Thread(gc[2]);
+	        		t4 = new Thread(gc[3]);
 	        		
 	        		t1.start();
 	        		t2.start();
 	        		t3.start();
+	        		t4.start();
 
 	        		long jetzt = System.currentTimeMillis();
 	        		while(System.currentTimeMillis() > jetzt +2000);
-	        		System.out.println("P:"+Board.realBoard.points[0]+" P1:"+Board.realBoard.points[1]+" P2:"+Board.realBoard.points[2]);
 					
-	        		//while(t1.isAlive() )
-	        		while(t1.isAlive() || t2.isAlive() || t3.isAlive()); //wait till game over //
-	        		System.out.println("P:"+Board.realBoard.points[0]+" P1:"+Board.realBoard.points[1]+" P2:"+Board.realBoard.points[2]);
+	        		while(t1.isAlive() || t2.isAlive() || t3.isAlive()|| t4.isAlive()); //wait till game over //
+	        		//System.out.println("P:");
+	        		//proc.
 					int sel = 0;					
-	        		if(Board.realBoard.points[1] > Board.realBoard.points[0]){ //who won
-	        				sel = 1;
-	        		}
-	        		if (Board.realBoard.points[2] > Board.realBoard.points[sel] ){
-	        				sel = 2;
-	        		}
-	        		Board.realBoard = new Board(); //new Game needs a new playfield
-	        		adaptedCands.add(new Integer[] {gc[sel].x, gc[sel].x, gc[sel].z});
-	        		//System.out.println(proc.exitValue());
-	        		while(proc.isAlive());
+	        		//TODO who won
+	        		//give client a board object? 
+	        		adaptedCands.add(new Float[] {gc[sel].weight_x, gc[sel].weight_y, gc[sel].weight_z});
+	        		//System.out.println(); return value of server?
+	        		//while(proc.isAlive());
 	        		proc.destroyForcibly();
 	        		
 	        		counter++;
@@ -138,9 +136,7 @@ public class Select {
 	        			if (again.equals("n"))break;
 	        		}
 	        	}
-        		
         	}
-        	
         }
 	
 	private static void load() {
