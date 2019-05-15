@@ -176,21 +176,20 @@ public class MinMax {
 		}
 		// TODO change into something better
 		return bo.getScore(player);
-		return freeStones + jumps;
 	}
 
-	int[] Shallow(Config Node, int Player, int Bound) {
+	int[] Shallow(Config Node, int Player, int Bound,int depth) throws Exception {
 		// add something here so that we can check if a player has a score = 7
 
 		int maxSum = 25;
-
-		if (Node.isTerminal()) {
-
-			/// this should indicate best or worst case scenarios ( iE win or lose)
-			return rateAll();
-		}
 		// get all possible moves that can be made for this player
 		List<Move> posMoves = board.calcFreeMoves(Player, board);
+		if (Node.isTerminal()||depth == 0 || posMoves == null) {
+
+			/// this should indicate best or worst case scenarios ( iE win or lose)
+			return rateAll(Player);
+		}
+	
 		// get the first child node
 		Move firstMove = posMoves.get(0);
 		// create cache and make the first possible move
@@ -198,7 +197,8 @@ public class MinMax {
 		cache = board.getStateConfig().clone();
 		board.makeMove(firstMove);
 		// populate the ratings table by evaluatibg the first leaf node
-		int Best[] = Shallow(board.getStateConfig(), nextPlayer(Player), maxSum);
+		depth--;
+		int Best[] = Shallow(board.getStateConfig(), nextPlayer(Player), maxSum,depth);
 		// reset the board so that it can be used again
 		board.setStateConfig(cache);
 		int i = 0;
@@ -207,13 +207,13 @@ public class MinMax {
 			if (i != 0) {
 
 				if (Best[Player]>= Bound) {
-
+					savedMove = move;
 					return Best;
 				}
 
 				cache = board.getStateConfig().clone();
 				board.makeMove(firstMove);
-				int Current[] = Shallow(board.getStateConfig(), nextPlayer(Player), maxSum);
+				int Current[] = Shallow(board.getStateConfig(), nextPlayer(Player), maxSum-Best[Player],depth);
 				if (Current[Player] >= Best[Player]) {
 
 					Best = Current;
