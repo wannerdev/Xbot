@@ -1,5 +1,7 @@
 package Xbot;
 
+import java.util.Arrays;
+
 class Config implements Cloneable {
 	Stone stones[] = new Stone[28];
 	byte stackSto[] = { 7, 7, 7, 7 };
@@ -58,41 +60,58 @@ class Config implements Cloneable {
 	public String toString() {
 		String rep = "";
 		for (int i = 6; i >= 0; i--) {
-			rep += i;
-
-			for (int j = 0; j <= 6; j++) {
-				boolean isthere = false;
-				for (Stone st : stones) {
-					if (i == st.y && j == st.x) {
-						rep += " X";
-						isthere = true;
-						break;
-					}
-				}
-				if (!isthere) {
-					rep += " .";
-				}
-			}
-			rep += "\n";
+			rep+=i;
+	
+	        for (int j = 0; j <= 6; j++) {
+	        	boolean isthere=false;
+	    		for(Stone st :stones) {
+		            if (i == st.y && j == st.x) {
+		            	switch(st.player) {
+		            	case 0: 
+			    			rep+=" X";
+			    			break;
+		            	case 1: 
+			    			rep+=" Y";
+			    			break;
+		            	case 2: 
+			    			rep+=" Z";
+			    			break;
+		            	case 3: 
+			    			rep+=" C";
+			    			break;
+		            		
+		            	}
+		                isthere=true;
+		                break;
+		            }
+	    		}
+	    		if(!isthere){
+	    			rep+=" .";
+	            }
+	        }
+			rep +="\n";
 		}
-		return rep;
-		// return "Config [stones=" + Arrays.toString(stones) + ", stackSto=" +
-		// Arrays.toString(stackSto) + ", ptr=" + ptr
-		// + "]";
+		return rep+"\n";
 	}
 
+	public String defaultToString() {
+		return "Config [stones=" + Arrays.toString(stones) + "\n, stackSto=" + Arrays.toString(stackSto) + ", ptr=" + ptr
+				+ "]";
+	}
+	
 	@Override
 	protected Config clone() {
 		Config c = new Config();
 		c.ptr = this.ptr;
-
-		for (int i = 0; i < stones.length; i++) {
-			c.stones[i] = this.stones[i];
+		//c.stones = this.stones.clone();
+		for(int i=0; i< stones.length; i++) {
+			c.stones[i] = this.stones[i].clone();
 		}
 		for (int i = 0; i < stackSto.length; i++) {
 			c.stackSto[i] = this.stackSto[i];
 		}
-
-		return c;
+		//c.stackSto = this.stackSto.clone();
+		
+		return c;		
 	}
 }

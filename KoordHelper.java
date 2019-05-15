@@ -5,6 +5,7 @@ import lenz.htw.sawhian.Move;
 public class KoordHelper {
 	
 	public static Move rotate(byte player, Move move) {
+		assert player <=3 && player > -1;
 		//System.out.println("Before turn"+amount+" X:"+move.x +" y:"+ move.y);
 		for(int i=0; i< player; i++) {
 			int y = move.y;
@@ -18,6 +19,7 @@ public class KoordHelper {
 	
 	
 	public static Move rotateBack(byte player, Move move) {
+		assert player <=3 && player > -1;
 		//System.out.println("Before turn"+amount+" X:"+move.x +" y:"+ move.y);
 		for(int i=0; i< player; i++) {
 			int y = move.y;

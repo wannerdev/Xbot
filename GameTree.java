@@ -12,8 +12,14 @@ public class GameTree {
 	}
 	
 	public Move MultiMax(int player, Board b) throws Exception{
-		MinMax alg = new MinMax(b);
-		return alg.run(player);
+		MinMax alg = new MinMax(b.getStateConfig().clone());
+		Move m = alg.run(player);
+		//If our Alg produces invalid moves
+		if(!Board.isValidMove(m, b)) {
+			System.err.println("MaxN produces invalid move");
+			m = calculateOneMove(player, b);
+		}
+		return m;
 	}
 	
 	
@@ -28,7 +34,7 @@ public class GameTree {
 			return myPossibleMoves.get(moveIndex);
 
 		} else {
-			throw new Exception("myPossibleMoves.size() <0 WTF ");
+			throw new Exception("myPossibleMoves.size() <0 Game Over - All stones Blocked (If moves possible check calcfreemoves)");
 		}
 	}
 }

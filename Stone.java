@@ -2,17 +2,19 @@ package Xbot;
 
 import lenz.htw.sawhian.Move;
 
-public class Stone {
+public class Stone implements Cloneable {
 
-	//Coords absolute, decided 22.04
+	
 	byte x, y, player;
-	public boolean inStack = true;
-	public boolean offField = false;
+	public boolean inStack;
+	public boolean isScored;
 	
 	Stone(byte x, byte y, byte player){
 		this.x = x;
 		this.y = y;
 		this.player = player;
+		inStack = true;
+		isScored = false;
 	}
 	/**
 	 * if two stones ahead	
@@ -23,7 +25,7 @@ public class Stone {
 	boolean isBlocked(Board bo) {		
 		Move dir = KoordHelper.playerToDirection(player);	    
 		if (!inStack) {
-			// if im not in stack get my forward neigbor
+			// if i'm not in stack get my forward neighbor
 			Stone neighbor = bo.getStoneAtKoord((x+dir.x), (y+dir.y));
 			if (neighbor != null) {
 				// if that neighbor exists
@@ -81,5 +83,24 @@ public class Stone {
 			return (byte) ((byte)7-this.y);			
 		}
 		return 7;
+	}
+	
+	public Stone clone() {
+		Stone st = new Stone((byte)-1,(byte)-1,(byte)-1);
+		st.inStack = this.inStack;
+		st.isScored = this.isScored;
+		st.player = this.player;
+		st.x = this.x;
+		st.y = this.y;
+		
+		return st;
+		
+		
+	}
+
+	@Override
+	public String toString() {
+		return "Stone [x=" + x + ", y=" + y + ", player=" + player + ", inStack=" + inStack + ", isScored=" + isScored
+				+ "]";
 	}
 }
