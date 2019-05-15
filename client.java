@@ -1,11 +1,10 @@
 package Xbot;
 
-import java.util.List;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.util.Random;
+import java.net.SocketException;
 import java.util.Scanner;
 
 import javax.imageio.ImageIO;
@@ -26,8 +25,9 @@ public class client {
 	// Man bekommt nur die position des steines nicht das Ziel da der Stein ja nur
 	// in eine Richtung kann
 	public static void main(String[] args) {
-		try {
 			load();
+			Board b = new Board();
+		try {
 			String logoh = "cybran";
 			BufferedImage logo = ImageIO.read(new File("src/Xbot/" +logoh + ".png"));
 			Integer num = (int) (Math.random() * 50);
@@ -35,17 +35,19 @@ public class client {
 			int myNumber = client.getMyPlayerNumber();
 			System.out.println("Player:" + myNumber);
 
-			Board b = new Board();
 			GameTree tree = new GameTree();
 			int x = 0, y = 0;
 			while (true) {
 				Move move = client.receiveMove(); // Man bekommt auch den eigenen Zug
 				System.out.println("Allmoves:" + b.calcFreeMoves(myNumber, b).toString());
-				Move lastmove = tree.randomMove(myNumber, b); 
-				if(myNumber == 0)tree.MultiMax(myNumber, b);
 				
+				//problem when  my next move is only possible by the player before me enabling(unblocking) a move
 				// ich bin dran
 				if (move == null) {
+					Move lastmove = tree.randomMove(myNumber, b);
+					if(myNumber == 0) {
+						lastmove  = tree.MultiMax(myNumber, b);
+					}
 					client.sendMove(lastmove);
 					// x++;
 				} else {
@@ -59,6 +61,9 @@ public class client {
 			}
 			//TODO recognize valid game end.
 			//save();
+		}catch (RuntimeException e) {
+			e.printStackTrace();			
+			System.err.println("Maybe GameOver Scores:"+b.getScores());
 		} catch (Exception e) {
 			save();
 			e.printStackTrace();

@@ -153,23 +153,28 @@ public class MinMax {
 			int secondPlayer = nextPlayer(player);
 			int thirdPlayer = nextPlayer(secondPlayer);
 			int fourthPlayer = nextPlayer(thirdPlayer);
-
-			if (bo.getScore(player) < bo.getScore(secondPlayer) || bo.getScore(player) < bo.getScore(thirdPlayer)
+			//TODO if all my stones are blocked and nobody has won yet i lost,?
+			
+			if (bo.getScore(player) < bo.getScore(secondPlayer)
+					|| bo.getScore(player) < bo.getScore(thirdPlayer)
 					|| bo.getScore(player) < bo.getScore(fourthPlayer)) {
 				// if anybody has a higher score
 				return Integer.MIN_VALUE; // lost
-			} else if (bo.getScore(player) > bo.getScore(secondPlayer) && bo.getScore(player) > bo.getScore(thirdPlayer)
+			} else if (bo.getScore(player) > bo.getScore(secondPlayer) 
+					&& bo.getScore(player) > bo.getScore(thirdPlayer)
 					&& bo.getScore(player) > bo.getScore(fourthPlayer)) {
 				// if i have the highest score
 				return Integer.MAX_VALUE; // Won
+				//if at least two people have the same score its a draw
 			} else if (bo.getScore(player) == bo.getScore(secondPlayer)
-					&& bo.getScore(thirdPlayer) == bo.getScore(fourthPlayer)) {
-				// TODO finish check
-				// Check all scores with each other
+					|| bo.getScore(player) == bo.getScore(thirdPlayer)
+					|| bo.getScore(player) == bo.getScore(fourthPlayer)
+					) {
+				//TODO check
 				return 0; // Draw
 			}
 		}
-		// TODO change
+		// TODO change into something better
 		return bo.getScore(player);
 	}
 

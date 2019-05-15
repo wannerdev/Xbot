@@ -37,15 +37,19 @@ public class Board {
 
 			for (int i = 0; i < 7; i++) {
 
-				Move relMove = new Move(player, i, 0);
-				Move absMove = relMove;
+				Move relMove = new Move(player, i, 0); //unrotated
+				Move absMove = new Move(player, i, 0);
 				if (player != 0) {
-
-					absMove = KoordHelper.rotate(player, relMove);
+					Move cache = KoordHelper.rotate(player, relMove);
+					int x = cache.x;
+					int y = cache.y;
+					int pl= cache.player;
+					absMove = new Move(pl, x, y); //rotated
 				}
+				//If not player 0 absMove is relativemove
 				if (spotIsFree(absMove.x, absMove.y, board.stateConfig)) {
 					if (isValidMove(absMove, board)) {
-						result.add(relMove);
+						result.add(absMove);
 						// System.out.println("Added Move: "+m);
 					}
 				}
@@ -61,7 +65,6 @@ public class Board {
 				if (isValidMove(move, board)) {
 					result.add(move);
 				}
-
 			}
 		}
 		return result;
@@ -176,6 +179,7 @@ public class Board {
 							st.isScored = true;
 							st.x = -2;
 							st.y = -2;
+							stateConfig.ptr--;
 						}
 						break;
 					}
@@ -203,10 +207,10 @@ public class Board {
 
 				// if it isn't then take a stone from the stack and place it
 				stone = getStoneFromStack(move.player);
-				// if we have a stone in stack
 				if(stone ==null) {
 					throw new Exception("Probably something with the board representation, no stone in stack");
 				}
+				// if we have a stone in stack
 				stone.inStack = false;
 				stateConfig.stackSto[move.player]--;
 				stateConfig.ptr++;
@@ -217,7 +221,6 @@ public class Board {
 				stone.y = (byte) y;
 				byte player = (byte) move.player;
 				stone.player = player;
-				// }
 
 			} else {
 
@@ -301,28 +304,17 @@ public class Board {
 		if ((x >= 0 && y >= 0 && x < 7 && y < 7) == false)
 			return null;
 		// search for stone
-		for (int i = 0; i < stateConfig.stones.length; i++) { // use stateConfig.ptr for better perfomance
+		for (int i = 0; i < stateConfig.stones.length; i++) { 
 			if (stateConfig.stones[i].x == x && stateConfig.stones[i].y == y) {
 				return stateConfig.stones[i];
 			}
 		}
 		return null;
 	}
-
-	/**
-	 * Better version of getStoneAtKoord
-	 * 
-	 * @param x
-	 * @param y
-	 * @returns null or Stone
-	 */
-	/*
-	 * public Stone getStone(int x, int y) { // respect board borders if ((x >= 0 &&
-	 * y >= 0 && x < 7 && y < 7) == false) return null; // search for stone int i =
-	 * 0; while (i < stateConfig.stones.length && (stateConfig.stones[i].x != x &&
-	 * stateConfig.stones[i].y != y)) { i++; } if (i != stateConfig.stones.length)
-	 * return stateConfig.stones[i]; return null; }
-	 */
+	
+	public String getScores(){
+		return "P0:"+this.getScore(0)+"P1:"+this.getScore(1)+"P2:"+this.getScore(2)+"P3:"+this.getScore(3);
+	}
 
 	/**
 	 * 

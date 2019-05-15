@@ -17,7 +17,7 @@ public class GameTree {
 		//If our Alg produces invalid moves
 		if(!Board.isValidMove(m, b)) {
 			System.err.println("MaxN produces invalid move");
-			m=calculateOneMove(player, b);
+			m = calculateOneMove(player, b);
 		}
 		return m;
 	}
@@ -34,7 +34,7 @@ public class GameTree {
 			return myPossibleMoves.get(moveIndex);
 
 		} else {
-			throw new Exception("myPossibleMoves.size() <0 Maybe Game Over? ");
+			throw new Exception("myPossibleMoves.size() <0 Game Over - All stones Blocked (If moves possible check calcfreemoves)");
 		}
 	}
 }
