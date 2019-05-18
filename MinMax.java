@@ -133,19 +133,26 @@ public class MinMax {
 
 		return ratings;
 	}
-
+	
+	// x = jumpWeight
+	// y = scoreWeight
+	// z = hasJumpedWeight
+    // f(x) = ((canJump+ (hasJumped*z)) * x) + (bo.getScore(player) * y);
 	int rate(int player) {
 		int freeStones = 0;
 		int jumps = 0;
 		Config conf = board.getStateConfig();
 		Board bo = board;
-
+		int weightJump = (player == 0) ? 2 : 1;
+		int weightScore = (player == 0) ? 3 : 1;
+		int weightFree = (player == 0) ? 7 : 0;
+		int weighthasJumped = (player == 0) ? 2: 0;
 		for (int i = player * 7; i < (player + 1) * 7; i++) { // for all stones of this player
 			if (!conf.stones[i].inStack && !conf.stones[i].isScored && !conf.stones[i].isBlocked(board)) { // Stone not
 																											// in stack
 																											// or
 				freeStones++;
-				jumps += (conf.stones[i].canJump(bo)+conf.stones[i].hasJumped*2);
+				jumps += (conf.stones[i].canJump(bo)+(conf.stones[i].hasJumped*weighthasJumped));
 			}
 		}
 
@@ -186,10 +193,7 @@ public class MinMax {
 			}
 		}
 
-		// TODO change into something better
-		int weightJump = (player == 0) ? 2 : 1;
-		int weightScore = (player == 0) ? 3 : 1;
-		int weightFree = (player == 0) ? 3 : 0;
+	
 		if (conf.stackSto[player] > weightFree) {
 
 			return freeStones + jumps + (bo.getScore(player) * weightScore);
