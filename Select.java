@@ -89,6 +89,11 @@ public class Select {
 	        		}
 	        		//System.out.println(); return value of server?	        		
 	        		counter++;
+	        		//Stop threads
+	        		gc[0].stop();
+	        		gc[1].stop();
+	        		gc[2].stop();
+	        		gc[3].stop();
 	        		
 	        		//all candidates played at least once
 	        		if(counter == 3) {
