@@ -14,27 +14,21 @@ import java.util.Set;
 import lenz.htw.sawhian.Server;
 
 public class Select {
-	static float weight_x = 0.5f, weight_y = 0.25f, weight_z = 0.25f; //arbitrary default values
+	//static float weight_x = 0.5f, weight_y = 0.25f, weight_z = 0.25f; //arbitrary default values
+	static Float[] weights= {0.5f,0.25f,0.25f, 1f};
 	static boolean lock = true;
 	//Not WORKING ATM
 	
 	public static void main(String[] args) {			
-		load();		
-		
-		//client cl = new client(null, null, null);
-		//Thread thread = new Thread(cl, "client1");
-		//thread.start();
+		load();		//from filesystem
 		
 		int quali[]= new int[12];
 		//Candidates
-		//Set<Integer[]> mutatedCand = new HashSet<Integer[]>();
 		Set<Float[]> candidates = new HashSet<Float[]>();
 		Set<Float[]> adaptedCands = new HashSet<Float[]>();
-		adaptedCands.add(new Float[] {(float) (Math.random()),(float) (Math.random()),(float) (Math.random())});
-		adaptedCands.add(new Float[] {(float) (Math.random()),(float) (Math.random()),(float) (Math.random())});
-		//just for the while loop
+		adaptedCands.add(Select.weights);
 		
-		firstfill(candidates);
+		candidates = firstfill(candidates);
 		Iterator<Float[]> it = candidates.iterator();
 		
         while(true) {
@@ -49,7 +43,7 @@ public class Select {
     		int counter = 0;
     		String again = "y";
     		int winner=-1;
-        	while( it.hasNext() && adaptedCands.size() != 1 && again!="n"){
+        	while( it.hasNext() && adaptedCands.size() != 0 && again!="n"){
         			Tserver srv= new Tserver();
 	        		tsrv = new Thread (srv,"Server");
 	        		tsrv.start();
@@ -86,6 +80,7 @@ public class Select {
 	        		//TODO who won
 					sel = srv.getWinner();
 					srv.stop();
+					System.out.println("getting winner:"+winner);
 	        		adaptedCands.add(new Float[] {gc[sel].weight_x, gc[sel].weight_y, gc[sel].weight_z});
 	        		//System.out.println(); return value of server?	        		
 	        		counter++;
@@ -101,24 +96,16 @@ public class Select {
 	        			it = adaptedCands.iterator();
 	        			while( it.hasNext() ) { //mutate
 	        				Float[] candi = it.next();
-	        				candi[0]= X + j;
-	        				candi[1]= Y + k;
-	        				candi[2]= Z + l;
-	        				j++;
-	        				if(j%2 ==0) {
-	        					j=j*-1;
-	        				}
-	        				k++;
-	        				if(k%2 !=0) {
-	        					k=k*-1;
-	        				}
-	        				l++;
-	        				if(l%2 ==0) {
-	        					l=l*-1;
-	        				}
+	        							//Range ist um den wert herum maximal einfach 
+	        				candi[0] = (float) ((float) candi[0]+((0.2)*Math.random()-0.2*Math.random()));
+	        				candi[1]= (float) ((float) candi[1]+((0.2)*Math.random()-0.2*Math.random()));
+	        				candi[2]= (float) ((float) candi[2]+((0.2)*Math.random()-0.2*Math.random()));
+	        				candi[3]++;
+	        				
 	        				candidates.add(candi); //refill candidates  
 	        			}
 	        			//and use one winner as test?
+	        			
 	        	        save();
 	        			System.out.println("Anothertime? y/n");
 	        			Scanner in = new Scanner(System.in);
@@ -151,9 +138,9 @@ public class Select {
 			scanner = new Scanner(new File("weights.csv"));
 	        scanner.useDelimiter(";");
 	        while(scanner.hasNext()){
-	            weight_x = Integer.valueOf(scanner.next());
-	            weight_y = Integer.valueOf(scanner.next());
-	            weight_z = Integer.valueOf(scanner.next());
+	        	weights[0] = Float.valueOf(scanner.next());
+	        	weights[1] = Float.valueOf(scanner.next());
+	        	weights[2] = Float.valueOf(scanner.next());
 	        }
 	        scanner.close();
 		} catch (FileNotFoundException e1) {
@@ -166,11 +153,11 @@ public class Select {
 		try {
 			PrintWriter pw = new PrintWriter(new File("weights.csv"));
 	        StringBuilder sb = new StringBuilder();
-	        sb.append(weight_x);
+	        sb.append(weights[0]);
 	        sb.append(';');
-	        sb.append(weight_y);
+	        sb.append(weights[1]);
 	        sb.append(';');
-	        sb.append(weight_z);
+	        sb.append(weights[2]);
 	        sb.append(';');
 	        sb.append('\n');
 	        pw.write(sb.toString());
