@@ -15,22 +15,28 @@ public class TestRun {
 				Tserver srv = new Tserver();
 				tsrv = new Thread(srv, "Server");
 				tsrv.start();
-				Thread clients[] = new Thread[4];
-				clients[0] = new Thread(new client(), "client0");// 0
-				clients[1]  = new Thread(new client(), "client1");// 1
-				clients[2]  = new Thread(new client(), "client2");// 2
-				clients[3]  = new Thread(new client(), "client3");// 3
-				clients[0].start();
-				clients[1].start();
-				clients[2].start();
-				clients[3].start();
+				Thread clientThreads[] = new Thread[4];
+				client clients[] = new client[4];
+				for(int i = 0; i < 4 ; i++) {
+					clients[i] = new client();
+					clientThreads[i] = new Thread(clients[i], "client"+i);// 0
+					clientThreads[i].start();
+				}
+				/*clientThreads[0] = new Thread(new client(), "client0");// 0
+				clientThreads[1]  = new Thread(new client(), "client1");// 1
+				clientThreads[2]  = new Thread(new client(), "client2");// 2
+				clientThreads[3]  = new Thread(new client(), "client3");// 3
+				clientThreads[0].start();
+				clientThreads[1].start();
+				clientThreads[2].start();
+				clientThreads[3].start();*/
 				System.out.println("Winner?:" + winner);
 				int aliveCount = 4;
 				while (aliveCount>0 && winner == -1) {
 					aliveCount = 4;
                     for(int i = 0; i < 4 ; i++) {
                     	
-                    	if (!clients[i].isAlive()) {
+                    	if (!clientThreads[i].isAlive()) {
                     		
                     		aliveCount--;
                     	}
@@ -41,7 +47,10 @@ public class TestRun {
 				System.out.println(tsrv.getName());
 				System.out.println("Winner:" + winner);
 				boolean flag = true;
+				for(int i = 0; i < 4 ; i++) {
 				
+					clients[i].stop();
+				}
 				srv.stop();
 				while (flag);
 					
