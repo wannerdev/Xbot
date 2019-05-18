@@ -42,16 +42,16 @@ class Config implements Cloneable {
 		            if (i == st.y && j == st.x) {
 		            	switch(st.player) {
 		            	case 0: 
-			    			rep+=" X";
+			    			rep+=" A";
 			    			break;
 		            	case 1: 
-			    			rep+=" Y";
+			    			rep+=" B";
 			    			break;
 		            	case 2: 
-			    			rep+=" Z";
+			    			rep+=" C";
 			    			break;
 		            	case 3: 
-			    			rep+=" C";
+			    			rep+=" D";
 			    			break;
 		            		
 		            	}

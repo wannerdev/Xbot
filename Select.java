@@ -15,32 +15,31 @@ import lenz.htw.sawhian.Server;
 
 public class Select {
 	static float weight_x = 0.5f, weight_y = 0.25f, weight_z = 0.25f; //arbitrary default values
+	static boolean lock = true;
 	//Not WORKING ATM
 	
 	public static void main(String[] args) {			
 		load();		
 		
-		client cl = new client(null, null, null);
-		Thread thread = new Thread(cl, "client1");
-		thread.start();
-		System.out.println(thread.getName());
+		//client cl = new client(null, null, null);
+		//Thread thread = new Thread(cl, "client1");
+		//thread.start();
+		
+		int quali[]= new int[12];
 		//Candidates
 		//Set<Integer[]> mutatedCand = new HashSet<Integer[]>();
 		Set<Float[]> candidates = new HashSet<Float[]>();
 		Set<Float[]> adaptedCands = new HashSet<Float[]>();
-		adaptedCands.add(new Float[] {(float) ((int)Math.random()*100),(float) ((int)Math.random()*100),(float) ((int)Math.random()*100)});
-		adaptedCands.add(new Float[] {(float) ((int)Math.random()*100),(float) ((int)Math.random()*100),(float) ((int)Math.random()*100)});
+		adaptedCands.add(new Float[] {(float) (Math.random()),(float) (Math.random()),(float) (Math.random())});
+		adaptedCands.add(new Float[] {(float) (Math.random()),(float) (Math.random()),(float) (Math.random())});
 		//just for the while loop
 		
-		for(int i=0; i < 9; i++) {
-			candidates.add(new Float[] {(float) ((int)Math.random()*100),(float) ((int)Math.random()*100),(float) ((int)Math.random()*100)});
-		}
+		firstfill(candidates);
 		Iterator<Float[]> it = candidates.iterator();
-		//server
-		Process proc = null;
+		
         while(true) {
         	//Server 
-        	Thread srv;
+        	Thread tsrv;
         	//clients
         	Thread t1;
     		Thread t2;
@@ -50,23 +49,24 @@ public class Select {
     		int counter = 0;
     		String again = "y";
     		int winner=-1;
-        	while( it.hasNext() && adaptedCands.size() != 1 && again!="n"){		
-	        		if(thread.getName() == "server") {
-						// Run server 
-						winner = Server.runOnceAndReturnTheWinner(2);
-						System.out.println("server up");
-					}
+        	while( it.hasNext() && adaptedCands.size() != 1 && again!="n"){
+        			Tserver srv= new Tserver();
+	        		tsrv = new Thread (srv,"Server");
+	        		tsrv.start();
+	        		
 	        		Float[] cand1 = it.next();
 	        		if(it.hasNext() == false)break;
 	        		Float[] cand2 = it.next();
 	        		if(it.hasNext() == false)break;
 	        		Float[] cand3 = it.next();
+	        		if(it.hasNext() == false)break;
+	        		Float[] cand4 = it.next();
 	        		
 	        		client[] gc = new client[4];
 	        		gc[0] = new client(cand1[0],cand1[1],cand1[2]);
 	        		gc[1] = new client(cand2[0],cand2[1],cand2[2]);
 	        		gc[2] = new client(cand3[0],cand3[1],cand3[2]);
-	        		gc[3] = new client(cand3[0],cand3[1],cand3[2]);
+	        		gc[3] = new client(cand4[0],cand4[1],cand4[2]);
 	
 	        		t1 = new Thread(gc[0]);
 	        		t2 = new Thread(gc[1]);
@@ -79,37 +79,26 @@ public class Select {
 	        		t4.start();
 
 	        		long jetzt = System.currentTimeMillis();
-	        		while(System.currentTimeMillis() > jetzt +2000);
-					
-	        		while(t1.isAlive() || t2.isAlive() || t3.isAlive()|| t4.isAlive()); //wait till game over //
-	        		
-					int sel = 0;					
+	        		while(System.currentTimeMillis() > jetzt +2000);//warte 2sek
+	        		while(lock);
+					int sel = 0;
+					System.out.println("getting winner");
 	        		//TODO who won
+					sel = srv.getWinner();
+					srv.stop();
 	        		adaptedCands.add(new Float[] {gc[sel].weight_x, gc[sel].weight_y, gc[sel].weight_z});
-	        		//System.out.println(); return value of server?
-	        		//while(proc.isAlive());
-	        		proc.destroyForcibly();
-	        		
+	        		//System.out.println(); return value of server?	        		
 	        		counter++;
 	        		
 	        		//all candidates played at least once
-	        		if(counter == 6) {
+	        		if(counter == 3) {
 	        			//recombination
-	        			//it = adaptedCands.iterator();
-	        			int medianX=0, medianY=0, medianZ=0;
-	        			for(Float[] cand : adaptedCands) {
-	        				medianX += cand[0];
-	        				medianY += cand[1];
-	        				medianZ += cand[2];
-	        			}
-	        			Float amount = (float) adaptedCands.size();
-	        			final Float X = (medianX/amount);
-	        			final Float Y = medianY/amount;
-	        			final Float Z = medianZ/amount;
+	        			
 	        			//adaptedCands.forEach((Integer[] cand)-> X++);
 	        			int j=0, l=0, k=0;
 	        			
 	        			candidates.removeAll(candidates);//loosers die
+	        			it = adaptedCands.iterator();
 	        			while( it.hasNext() ) { //mutate
 	        				Float[] candi = it.next();
 	        				candi[0]= X + j;
@@ -127,12 +116,12 @@ public class Select {
 	        				if(l%2 ==0) {
 	        					l=l*-1;
 	        				}
-	        				candidates.add(candi); 
+	        				candidates.add(candi); //refill candidates  
 	        			}
-	        			//refill candidates and use one winner as test?
+	        			//and use one winner as test?
+	        	        save();
 	        			System.out.println("Anothertime? y/n");
 	        			Scanner in = new Scanner(System.in);
-
 	        			int i = in.nextInt();
 	        			again = in.next();
 	        			if (again.equals("n"))break;
@@ -141,6 +130,20 @@ public class Select {
         	}
         }
 	
+	private static Set<Float[]> firstfill(Set<Float[]> cands) {
+		for(int i=0; i < 12; i++) {
+			cands.add(new Float[] {(float) (Math.random()),(float) (Math.random()*100),(float) (Math.random()*100)});
+		}
+		return cands;
+	}
+	
+	private static Set<Float[]> mutate(Set<Float[]> winners) {
+		for(int i=0; i < 12; i++) {
+			winners.add(new Float[] {(float) (Math.random()),(float) (Math.random()*100),(float) (Math.random()*100)});
+		}
+		return winners;
+	}
+
 	private static void load() {
 		Scanner scanner=null;
 		try {
@@ -154,6 +157,7 @@ public class Select {
 	        }
 	        scanner.close();
 		} catch (FileNotFoundException e1) {
+			System.out.println("using default values");
 			// do nothing use standards
 		}		
 	}
@@ -176,4 +180,19 @@ public class Select {
 			throw new AssertionError();
 		}
 	}
+	
+	/**
+	 * //it = adaptedCands.iterator();
+	        			/*
+	        			int medianX=0, medianY=0, medianZ=0;
+	        			for(Float[] cand : adaptedCands) {
+	        				medianX += cand[0];
+	        				medianY += cand[1];
+	        				medianZ += cand[2];
+	        			}
+	        			Float amount = (float) adaptedCands.size();
+	        			final Float X = (medianX/amount);
+	        			final Float Y = medianY/amount;
+	        			final Float Z = medianZ/amount;
+	        			*/
 }

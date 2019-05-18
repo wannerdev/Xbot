@@ -35,12 +35,13 @@ public class client implements Runnable{
 	@Override
 	public void run() {
 			Board b = new Board();
+			int myNumber = -1;
 		try {
 			String logoh = "cybran";
 			BufferedImage logo = ImageIO.read(new File("src/Xbot/" +logoh + ".png"));
 			Integer num = (int) (Math.random() * 50);
 			NetworkClient client = new NetworkClient(null, "XBot" + num.toString() + "000", logo);
-			int myNumber = client.getMyPlayerNumber();
+			myNumber = client.getMyPlayerNumber();
 			System.out.println("Player:" + myNumber);
 
 			GameTree tree = new GameTree();
@@ -52,9 +53,11 @@ public class client implements Runnable{
 				// ich bin dran
 				if (move == null) {
 					System.out.println("Allmoves:" + b.calcFreeMoves(myNumber, b).toString());
-					Move lastmove = tree.randomMove(myNumber, b);
+					Move lastmove =null;
 					if(myNumber == 0) {
 						lastmove  = tree.MultiMax(myNumber, b);
+					}else {
+						lastmove= tree.randomMove(myNumber, b);
 					}
 					if(lastmove == null|| lastmove.y==-1)throw new Exception("Game over:"+b.getScores());
 					client.sendMove(lastmove);
@@ -62,18 +65,19 @@ public class client implements Runnable{
 					if( move.y==-1)throw new Exception("Game over:"+b.getScores());
 					// baue Zug in meine spielfeldrepr�sentation ein
 					b.makeMove(move);
-					System.out.println(" Anzahl steine: " + b.getStateConfig().ptr);
+					System.out.println("Anzahl steine: " + b.getStateConfig().ptr);
 					System.out.println(b.getStateConfig().toString());
 					System.out.println("MOVE: X = " + move.x + " || Y = " + move.y);
 				}
 			}
 			//TODO recognize valid game end.
 		}catch (RuntimeException e) {
+			System.err.println(e.getLocalizedMessage());
 			e.printStackTrace();			
-			System.err.println("GameOver Scores:"+b.getScores());
+			System.err.println("Player"+myNumber+" Runtime Excep: GameOver Scores:"+b.getScores());
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.err.println("Exception: \n" + e.getLocalizedMessage());
+			System.err.println("Player"+myNumber+" Exception: \n" + e.getLocalizedMessage());
 		}
 	}
 
