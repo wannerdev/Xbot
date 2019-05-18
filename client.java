@@ -39,14 +39,16 @@ public class client {
 			int x = 0, y = 0;
 			while (true) {
 				Move move = client.receiveMove(); // Man bekommt auch den eigenen Zug
-				System.out.println("Allmoves:" + b.calcFreeMoves(myNumber, b).toString());
+				
 				
 				//problem when  my next move is only possible by the player before me enabling(unblocking) a move
 				// ich bin dran
 				if (move == null) {
+					System.out.println("Allmoves:" + b.calcFreeMoves(myNumber, b).toString());
 					Move lastmove = tree.randomMove(myNumber, b);
 					if(myNumber == 0) {
 						lastmove  = tree.MultiMax(myNumber, b);
+						
 					}
 					client.sendMove(lastmove);
 					// x++;

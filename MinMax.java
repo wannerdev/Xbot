@@ -12,7 +12,7 @@ public class MinMax {
 	private int targetDepth = 2;
 	public int[] alive;
 	public Board board;
-	public final int maxsum = 5;
+	public final int maxsum = 7;
 	public final int maxp = 7;
 
 	// public int weight1;
@@ -152,7 +152,7 @@ public class MinMax {
 		Config conf = board.getStateConfig();
 		Board bo = board;
 		for (int i = player * 5; i < (player + 1) * 5; i++) { // for all stones of this player
-			if (!conf.stones[i].inStack && (conf.stones[i].x != 7 || conf.stones[i].x != 7)) { // Stone not in stack or
+			if (!conf.stones[i].inStack && !conf.stones[i].isScored && !conf.stones[i].isBlocked(board) ) { // Stone not in stack or
 				freeStones++;
 				jumps += conf.stones[i].canJump(bo);
 			}
@@ -183,9 +183,9 @@ public class MinMax {
 
 		if (conf.stackSto[player] > 0) {
 
-			return freeStones + jumps + bo.getScore(player);
+			return freeStones + jumps + (bo.getScore(player)*2);
 		} else {
-			return (jumps*2) + bo.getScore(player);
+			return (jumps * 2) + (bo.getScore(player)*3);
 
 		}
 
@@ -193,7 +193,10 @@ public class MinMax {
 
 	int[] Shallow(Config Node, int Player, int Bound, int depth) throws Exception {
 		// add something here so that we can check if a player has a score = 7
+		if (Bound < 0) {
 
+			Bound = 0;
+		}
 		// get all possible moves that can be made for this player
 		List<Move> posMoves = board.calcFreeMoves(Player, board);
 
@@ -209,18 +212,19 @@ public class MinMax {
 		cache = board.getStateConfig().clone();
 		board.makeMove(firstMove);
 		// populate the ratings table by evaluating the first leaf node
-		
-		int Best[] = Shallow(board.getStateConfig(), nextPlayer(Player), maxsum, depth-1);
+
+		int Best[] = Shallow(board.getStateConfig(), nextPlayer(Player), maxsum, depth - 1);
+	
 		// reset the board so that it can be used again
 		board.setStateConfig(cache);
 		int i = 0;
-		// now for the remaining child nodes	board.setStateConfig(cache);
-
+		// now for the remaining child nodes board.setStateConfig(cache);
+		int Current[];
 		for (Move move : posMoves) {
 			if (i != 0) {
 
 				if (Best[Player] >= Bound) {
-					if (move.player == Player && depth == targetDepth*3) {
+					if (move.player == Player && depth == targetDepth * 3) {
 						savedMove[Player] = move;
 					}
 					return Best;
@@ -229,12 +233,12 @@ public class MinMax {
 				cache = board.getStateConfig().clone();
 				board.makeMove(move);
 
-				int Current[] = Shallow(board.getStateConfig(), nextPlayer(Player), maxsum - Best[Player], depth-1);
+			     Current = Shallow(board.getStateConfig(), nextPlayer(Player), maxsum - Best[Player], depth - 1);
 
-				if (Current[Player] >  Best[Player]) {
-					
-				    backUpMove[Player] = move;
-				
+				if (Current[Player] > Best[Player] && depth == targetDepth * 3) {
+
+					backUpMove[Player] = move;
+
 					Best = Current;
 
 				}
@@ -243,10 +247,29 @@ public class MinMax {
 			}
 
 			i++;
-		
 
 		}
-       
+		if (depth == targetDepth * 3) {
+			if (backUpMove[Player] == null && savedMove[Player] == null) {
+				savedMove[Player] = firstMove;
+				System.out.println("this is fucked");
+			}else if (backUpMove[Player] != null) {
+				
+				if (!Board.isValidMove(backUpMove[Player], board)) {
+
+					System.out.println("this is fucked2");
+				}
+			}else if (savedMove[Player] != null) {
+				
+				if (!Board.isValidMove(savedMove[Player], board)) {
+
+					System.out.println("this is fucked3");
+				}
+			}
+
+		
+		}
+
 		return Best;
 
 	}

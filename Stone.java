@@ -63,11 +63,11 @@ public class Stone implements Cloneable {
 			result = 1;
 		}
 		//hastwo ahead and two space
-		if((result ==1 && bo.getStoneAtKoord((x+dir.x*3), (y+dir.y*3)) != null) && bo.getStoneAtKoord((x+dir.x), (y+dir.y)).player !=this.player &&  (bo.getStoneAtKoord((x+dir.x*4), (y+dir.y*4)) == null) ) {
+		if((result ==1 && bo.getStoneAtKoord((x+dir.x*3), (y+dir.y*3)) != null) && bo.getStoneAtKoord((x+dir.x*3), (y+dir.y*3)).player !=this.player &&  (bo.getStoneAtKoord((x+dir.x*4), (y+dir.y*4)) == null) ) {
 			result++;	
 		}
 		//hasthree ahead and three space
-		if(result ==2 &&(bo.getStoneAtKoord((x+dir.x*5), (y+dir.y*5)) != null)&& bo.getStoneAtKoord((x+dir.x), (y+dir.y)).player !=this.player && (bo.getStoneAtKoord((x+dir.x*6), (y+dir.y*6)) == null) ) {
+		if(result ==2 &&(bo.getStoneAtKoord((x+dir.x*5), (y+dir.y*5)) != null)&& bo.getStoneAtKoord((x+dir.x*5), (y+dir.y*5)).player !=this.player && (bo.getStoneAtKoord((x+dir.x*6), (y+dir.y*6)) == null) ) {
 			result++;
 		}
 		return result;		
