@@ -245,10 +245,21 @@ public class Board {
 	int getScore(int player) {
 		int score = 0;
 		for (int i = player * 7; i < (player + 1) * 7; i++) {
-			if (stateConfig.stones[i].x == 7 || stateConfig.stones[i].y == 7)
+			if (stateConfig.stones[i].isScored)
 				score++;
 		}
 		return score;
+	}
+	
+	
+	boolean isAllBlocked(int player) {
+		int blocked = 0;
+		for (int i = player * 7; i < (player + 1) * 7; i++) {
+			if (stateConfig.stones[i].isScored)
+				blocked++;
+		}
+	
+		return (blocked == 7);
 	}
 
 	// check if move is in starting row

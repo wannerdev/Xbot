@@ -12,8 +12,9 @@ public class MinMax {
 	private int targetDepth = 2;
 	public int[] alive;
 	public Board board;
-	public final int maxsum = 7;
+	public final int maxsum = 10;
 	public final int maxp = 7;
+	private int prune = 0;
 
 	// public int weight1;
 	// public int weight2;
@@ -32,6 +33,7 @@ public class MinMax {
 
 		System.out.println("Player" + player + ", Rating of the move:" + rating[player]);
 		System.out.println("Rating of All" + ":" + rating[0] + " " + rating[1] + " " + rating[2] + " " + rating[3]);
+		System.out.println("MAXN pruned ("+prune+") times!");
 		if (savedMove[player] == null) {
 			System.out.println("BACKUPMOVE: X = " + backUpMove[player].x + " || Y = " + backUpMove[player].y);
 			return backUpMove[player];
@@ -49,7 +51,7 @@ public class MinMax {
 		List<Move> posMoves = board.calcFreeMoves(player, board);
 		// if I am the final node, evaluate my Configuration and return the rating
 		if (depth == 0 || posMoves == null) {
-			ratings = rateAll(player);
+			ratings = rateAll();
 			return ratings;
 		}
 		Config cache;
@@ -65,7 +67,7 @@ public class MinMax {
 			// make the move to create new config / Node
 			board.makeMove(move);
 			// check to see if Node is Terminal
-			ratings = rateAll(player);
+			ratings = rateAll();
 			if (ratings[player] == Integer.MAX_VALUE) {
 				// savedMove = move;
 				return ratings;
@@ -121,28 +123,13 @@ public class MinMax {
 		return player;
 	}
 
-	int[] rateAll(int player) {
+	int[] rateAll() {
 		int ratings[] = new int[4];
 		ratings[0] = rate(0);
 		ratings[1] = rate(1);
 		ratings[2] = rate(2);
 		ratings[3] = rate(3);
-		for (int i = 0; i < 4; i++) {
-			if (ratings[i] == maxp) {
-				// if Terminal check for the winner
-				if (i == player) {
-					// if we won save the move and break ??
-					// savedMove = move;
-					ratings[player] = Integer.MAX_VALUE;
-					return ratings;
-
-				} else {
-					// if we lost make sure to rate this config the worst possible
-					ratings[player] = Integer.MIN_VALUE;
-					return ratings;
-				}
-			}
-		}
+	
 		return ratings;
 	}
 
@@ -151,10 +138,32 @@ public class MinMax {
 		int jumps = 0;
 		Config conf = board.getStateConfig();
 		Board bo = board;
+		
+		
+		
+		
+		
+		
 		for (int i = player * 5; i < (player + 1) * 5; i++) { // for all stones of this player
 			if (!conf.stones[i].inStack && !conf.stones[i].isScored && !conf.stones[i].isBlocked(board) ) { // Stone not in stack or
 				freeStones++;
 				jumps += conf.stones[i].canJump(bo);
+			}
+		}
+		
+		for (int i = 0; i < 4; i++) {
+			if (board.getScore(i) == maxp) {
+				// if Terminal check for the winner
+				if (i == player) {
+								
+					return Integer.MAX_VALUE;
+				
+
+				} else {
+					// if we lost make sure to rate this config the worst possible
+					return Integer.MIN_VALUE;
+				
+				}
 			}
 		}
 		if (freeStones == 0) {
@@ -163,8 +172,10 @@ public class MinMax {
 			int fourthPlayer = nextPlayer(thirdPlayer);
 			// TODO if all my stones are blocked and nobody has won yet i lost,?
 
-			if (bo.getScore(player) < bo.getScore(secondPlayer) || bo.getScore(player) < bo.getScore(thirdPlayer)
-					|| bo.getScore(player) < bo.getScore(fourthPlayer)) {
+			if (bo.getScore(player) < bo.getScore(secondPlayer) ||
+				bo.getScore(player) < bo.getScore(thirdPlayer) ||
+				bo.getScore(player) < bo.getScore(fourthPlayer)|| 
+				bo.isAllBlocked(player)) {
 				// if anybody has a higher score
 				return Integer.MIN_VALUE; // lost
 			} else if (bo.getScore(player) > bo.getScore(secondPlayer) && bo.getScore(player) > bo.getScore(thirdPlayer)
@@ -177,8 +188,12 @@ public class MinMax {
 					|| bo.getScore(player) == bo.getScore(fourthPlayer)) {
 				// TODO check
 				return 0; // Draw
-			}
+			} 
 		}
+		
+		
+		
+	
 		// TODO change into something better
 
 		if (conf.stackSto[player] > 0) {
@@ -203,7 +218,7 @@ public class MinMax {
 		if (Node.isTerminal() || posMoves.size() == 0 || depth == 0) {
 
 			/// this should indicate best or worst case scenarios ( iE win or lose)
-			return rateAll(Player);
+			return rateAll();
 		}
 		// get the first child node
 		Move firstMove = posMoves.get(0);
@@ -218,6 +233,7 @@ public class MinMax {
 		// reset the board so that it can be used again
 		board.setStateConfig(cache);
 		int i = 0;
+		
 		// now for the remaining child nodes board.setStateConfig(cache);
 		int Current[];
 		for (Move move : posMoves) {
@@ -226,7 +242,9 @@ public class MinMax {
 				if (Best[Player] >= Bound) {
 					if (move.player == Player && depth == targetDepth * 3) {
 						savedMove[Player] = move;
+					
 					}
+					prune++;
 					return Best;
 				}
 

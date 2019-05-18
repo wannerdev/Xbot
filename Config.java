@@ -34,9 +34,8 @@ class Config implements Cloneable {
 
 		for (int i = 0; i < 4; i++) {
 
-			int playerScore = getScore(i);
 
-			if (playerScore >= 7) {
+			if (getScore(i) >= 7) {
 
 				return true;
 			}
