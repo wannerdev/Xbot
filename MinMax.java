@@ -1,5 +1,6 @@
 package Xbot;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +13,7 @@ public class MinMax {
 	private int targetDepth = 2;
 	public int[] alive;
 	public Board board;
-	public final int maxsum = 10;
+	public final int maxsum = 21;
 	public final int maxp = 7;
 	private int prune = 0;
 
@@ -33,7 +34,7 @@ public class MinMax {
 
 		System.out.println("Player" + player + ", Rating of the move:" + rating[player]);
 		System.out.println("Rating of All" + ":" + rating[0] + " " + rating[1] + " " + rating[2] + " " + rating[3]);
-		System.out.println("MAXN pruned ("+prune+") times!");
+		System.out.println("MAXN pruned (" + prune + ") times!");
 		if (savedMove[player] == null) {
 			System.out.println("BACKUPMOVE: X = " + backUpMove[player].x + " || Y = " + backUpMove[player].y);
 			return backUpMove[player];
@@ -129,7 +130,7 @@ public class MinMax {
 		ratings[1] = rate(1);
 		ratings[2] = rate(2);
 		ratings[3] = rate(3);
-	
+
 		return ratings;
 	}
 
@@ -138,44 +139,38 @@ public class MinMax {
 		int jumps = 0;
 		Config conf = board.getStateConfig();
 		Board bo = board;
-		
-		
-		
-		
-		
-		
-		for (int i = player * 5; i < (player + 1) * 5; i++) { // for all stones of this player
-			if (!conf.stones[i].inStack && !conf.stones[i].isScored && !conf.stones[i].isBlocked(board) ) { // Stone not in stack or
+
+		for (int i = player * 7; i < (player + 1) * 7; i++) { // for all stones of this player
+			if (!conf.stones[i].inStack && !conf.stones[i].isScored && !conf.stones[i].isBlocked(board)) { // Stone not
+																											// in stack
+																											// or
 				freeStones++;
 				jumps += conf.stones[i].canJump(bo);
 			}
 		}
-		
+
 		for (int i = 0; i < 4; i++) {
 			if (board.getScore(i) == maxp) {
 				// if Terminal check for the winner
 				if (i == player) {
-								
+
 					return Integer.MAX_VALUE;
-				
 
 				} else {
 					// if we lost make sure to rate this config the worst possible
 					return Integer.MIN_VALUE;
-				
+
 				}
 			}
 		}
-		if (freeStones == 0) {
+		if (bo.isAllBlocked(player,board)) {
 			int secondPlayer = nextPlayer(player);
 			int thirdPlayer = nextPlayer(secondPlayer);
 			int fourthPlayer = nextPlayer(thirdPlayer);
 			// TODO if all my stones are blocked and nobody has won yet i lost,?
 
-			if (bo.getScore(player) < bo.getScore(secondPlayer) ||
-				bo.getScore(player) < bo.getScore(thirdPlayer) ||
-				bo.getScore(player) < bo.getScore(fourthPlayer)|| 
-				bo.isAllBlocked(player)) {
+			if (bo.getScore(player) < bo.getScore(secondPlayer) || bo.getScore(player) < bo.getScore(thirdPlayer)
+					|| bo.getScore(player) < bo.getScore(fourthPlayer) || bo.isAllBlocked(player,board)) {
 				// if anybody has a higher score
 				return Integer.MIN_VALUE; // lost
 			} else if (bo.getScore(player) > bo.getScore(secondPlayer) && bo.getScore(player) > bo.getScore(thirdPlayer)
@@ -187,20 +182,19 @@ public class MinMax {
 					|| bo.getScore(player) == bo.getScore(thirdPlayer)
 					|| bo.getScore(player) == bo.getScore(fourthPlayer)) {
 				// TODO check
-				return 0; // Draw
-			} 
+				return -1; // Draw
+			}
 		}
-		
-		
-		
-	
+
 		// TODO change into something better
+		int weightJump = (player == 0) ? 2 : 1;
+		int weightScore = (player == 0) ? 3 : 1;
+		int weightFree = (player == 0) ? 3 : 0;
+		if (conf.stackSto[player] > weightFree) {
 
-		if (conf.stackSto[player] > 0) {
-
-			return freeStones + jumps + (bo.getScore(player)*2);
+			return freeStones + jumps + (bo.getScore(player) * weightScore);
 		} else {
-			return (jumps * 2) + (bo.getScore(player)*3);
+			return (jumps * weightJump) + (bo.getScore(player) * weightScore);
 
 		}
 
@@ -229,11 +223,11 @@ public class MinMax {
 		// populate the ratings table by evaluating the first leaf node
 
 		int Best[] = Shallow(board.getStateConfig(), nextPlayer(Player), maxsum, depth - 1);
-	
+
 		// reset the board so that it can be used again
 		board.setStateConfig(cache);
 		int i = 0;
-		
+
 		// now for the remaining child nodes board.setStateConfig(cache);
 		int Current[];
 		for (Move move : posMoves) {
@@ -242,7 +236,7 @@ public class MinMax {
 				if (Best[Player] >= Bound) {
 					if (move.player == Player && depth == targetDepth * 3) {
 						savedMove[Player] = move;
-					
+
 					}
 					prune++;
 					return Best;
@@ -251,8 +245,13 @@ public class MinMax {
 				cache = board.getStateConfig().clone();
 				board.makeMove(move);
 
-			     Current = Shallow(board.getStateConfig(), nextPlayer(Player), maxsum - Best[Player], depth - 1);
+				Current = Shallow(board.getStateConfig(), nextPlayer(Player), maxsum - Best[Player], depth - 1);
+				if (depth == targetDepth * 3) {
 
+					System.out.println("Move " + i + " Score:: " + Current[0] + " " + Current[1] + " " + Current[2]
+							+ " " + Current[3]);
+
+				}
 				if (Current[Player] > Best[Player] && depth == targetDepth * 3) {
 
 					backUpMove[Player] = move;
@@ -262,6 +261,14 @@ public class MinMax {
 				}
 				// reset the board so that it can be used again
 				board.setStateConfig(cache);
+			} else {
+				if (depth == targetDepth * 3) {
+
+					System.out.println(
+							"Move " + i + " Score:: " + Best[0] + " " + Best[1] + " " + Best[2] + " " + Best[3]);
+
+				}
+
 			}
 
 			i++;
@@ -271,21 +278,20 @@ public class MinMax {
 			if (backUpMove[Player] == null && savedMove[Player] == null) {
 				savedMove[Player] = firstMove;
 				System.out.println("this is fucked");
-			}else if (backUpMove[Player] != null) {
-				
+			} else if (backUpMove[Player] != null) {
+
 				if (!Board.isValidMove(backUpMove[Player], board)) {
 
 					System.out.println("this is fucked2");
 				}
-			}else if (savedMove[Player] != null) {
-				
+			} else if (savedMove[Player] != null) {
+
 				if (!Board.isValidMove(savedMove[Player], board)) {
 
 					System.out.println("this is fucked3");
 				}
 			}
 
-		
 		}
 
 		return Best;

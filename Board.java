@@ -252,10 +252,10 @@ public class Board {
 	}
 	
 	
-	boolean isAllBlocked(int player) {
+	boolean isAllBlocked(int player, Board board) {
 		int blocked = 0;
 		for (int i = player * 7; i < (player + 1) * 7; i++) {
-			if (stateConfig.stones[i].isScored)
+			if (stateConfig.stones[i].isBlocked(board))
 				blocked++;
 		}
 	
