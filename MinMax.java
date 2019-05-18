@@ -27,11 +27,11 @@ public class MinMax {
 		int[] rating = new int[4];
 		// Multiply by 3 because we are 4 players
 		rating = maxN(player, targetDepth * 3);
-
-		System.out.println("Player" + player + ", Rating of the move:" + rating[player]);
-		System.out.println("MOVE: X = " + savedMove.x + " || Y = " + savedMove.y);
-		System.out.println("Rating of All" + ":" + rating[0] + " " + rating[1] + " " + rating[2] + " " + rating[3]);
-
+		if(savedMove!=null) {
+			System.out.println("Player" + player + ", Rating of the move:" + rating[player]);
+			System.out.println("MOVE: X = " + savedMove.x + " || Y = " + savedMove.y);
+			System.out.println("Rating of All" + ":" + rating[0] + " " + rating[1] + " " + rating[2] + " " + rating[3]);
+		}
 		return savedMove;
 	}
 

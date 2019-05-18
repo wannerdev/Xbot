@@ -16,7 +16,7 @@ public class client implements Runnable{
 
 	float weight_x = 0.5f, weight_y = 0.25f, weight_z = 0.25f; //arbitrary default values
 	
-	// Laptop Auflösung server
+	// Laptop Auflï¿½sung server
 	// java -Djava.library.path=C:\Users\Johannes\Dropbox\Java\sawhian\lib\native
 	// -jar C:\Users\Johannes\Dropbox\Java\sawhian\sawhian.jar 4 1600 900	
 	// Desktop
@@ -26,6 +26,10 @@ public class client implements Runnable{
 		this.weight_x = weight_x;
 		this.weight_y = weight_y;
 		this.weight_z = weight_z;
+	}
+
+	public client() {
+		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -47,17 +51,18 @@ public class client implements Runnable{
 				//problem when  my next move is only possible by the player before me enabling() a move
 				// ich bin dran
 				if (move == null) {
+					System.out.println("Allmoves:" + b.calcFreeMoves(myNumber, b).toString());
 					Move lastmove = tree.randomMove(myNumber, b);
 					if(myNumber == 0) {
 						lastmove  = tree.MultiMax(myNumber, b);
 					}
+					if(lastmove == null|| lastmove.y==-1)throw new Exception("Game over:"+b.getScores());
 					client.sendMove(lastmove);
 				} else {
-					System.out.println("Allmoves:" + b.calcFreeMoves(myNumber, b).toString());
-					// baue Zug in meine spielfeldrepräsentation ein
+					if( move.y==-1)throw new Exception("Game over:"+b.getScores());
+					// baue Zug in meine spielfeldreprï¿½sentation ein
 					b.makeMove(move);
 					System.out.println(" Anzahl steine: " + b.getStateConfig().ptr);
-
 					System.out.println(b.getStateConfig().toString());
 					System.out.println("MOVE: X = " + move.x + " || Y = " + move.y);
 				}

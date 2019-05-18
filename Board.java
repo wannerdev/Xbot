@@ -80,6 +80,11 @@ public class Board {
 	 * @returns true if possible
 	 */
 	public static boolean isValidMove(Move m, Board board) throws Exception {
+		if(m == null) {
+			//System.err.println("NO Move");
+			throw new Exception("NO Move");
+			//return;
+		}
 		if ((m.x >= 0 && m.y >= 0 && m.x < 7 && m.y < 7) == false)
 			return false;// throw new Exception("isValidMove() Borders");
 
@@ -139,10 +144,18 @@ public class Board {
 	 */
 	public void moveStone(Move move) throws Exception {
 		// bestimme den RichtungsVektor f�r den aktuellen Zug
-
+		if(move == null) {
+			//System.err.println("NO Move");
+			throw new Exception("NO Move");
+			//return;
+		}
 		Vector2 moveDir = new Vector2(0, 0);
 		int howManyFields = 1;
-		int jmp = this.getStoneAtKoord(move.x, move.y).canJump(this);
+		int jmp =0;
+		Stone sto = this.getStoneAtKoord(move.x, move.y);
+		if(sto != null){
+			jmp = sto.canJump(this);
+		}
 		if (jmp > 0) {
 			howManyFields = jmp * 2; // if we can jump we have to jump.
 		}
@@ -199,6 +212,12 @@ public class Board {
 	 *             if player is out of range
 	 */
 	public void makeMove(Move move) throws Exception {
+
+		if(move == null) {
+			//System.err.println("NO Move");
+			throw new Exception("NO Move");
+			//return;
+		}
 		Stone stone = null;
 
 		if (isMoveInStartingRow(move)) {
@@ -245,7 +264,7 @@ public class Board {
 	int getScore(int player) {
 		int score = 0;
 		for (int i = player * 7; i < (player + 1) * 7; i++) {
-			if (stateConfig.stones[i].x == 7 || stateConfig.stones[i].y == 7)
+			if (stateConfig.stones[i].isScored)//stateConfig.stones[i].x == 7 || stateConfig.stones[i].y == 7)
 				score++;
 		}
 		return score;

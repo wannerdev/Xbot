@@ -11,6 +11,8 @@ import java.util.Iterator;
 import java.util.Scanner;
 import java.util.Set;
 
+import lenz.htw.sawhian.Server;
+
 public class Select {
 	static float weight_x = 0.5f, weight_y = 0.25f, weight_z = 0.25f; //arbitrary default values
 	//Not WORKING ATM
@@ -18,6 +20,10 @@ public class Select {
 	public static void main(String[] args) {			
 		load();		
 		
+		client cl = new client(null, null, null);
+		Thread thread = new Thread(cl, "client1");
+		thread.start();
+		System.out.println(thread.getName());
 		//Candidates
 		//Set<Integer[]> mutatedCand = new HashSet<Integer[]>();
 		Set<Float[]> candidates = new HashSet<Float[]>();
@@ -33,6 +39,8 @@ public class Select {
 		//server
 		Process proc = null;
         while(true) {
+        	//Server 
+        	Thread srv;
         	//clients
         	Thread t1;
     		Thread t2;
@@ -41,16 +49,12 @@ public class Select {
     		//evaluation
     		int counter = 0;
     		String again = "y";
+    		int winner=-1;
         	while( it.hasNext() && adaptedCands.size() != 1 && again!="n"){		
-	        		try {
-	        			// Run server in a separate system process
-						proc = Runtime.getRuntime().exec(""
-								+ "java -Djava.library.path=D:\\Wichtig\\Programmieren\\Java\\Xbot\\sawhian\\lib\\native -jar D:\\Wichtig\\Programmieren\\Java\\Xbot\\sawhian\\sawhian.jar 4 1600 900\r\n" + 
-								"	 8 noanim");
-						System.out.println("running");
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						throw new AssertionError();
+	        		if(thread.getName() == "server") {
+						// Run server 
+						winner = Server.runOnceAndReturnTheWinner(2);
+						System.out.println("server up");
 					}
 	        		Float[] cand1 = it.next();
 	        		if(it.hasNext() == false)break;
@@ -78,11 +82,9 @@ public class Select {
 	        		while(System.currentTimeMillis() > jetzt +2000);
 					
 	        		while(t1.isAlive() || t2.isAlive() || t3.isAlive()|| t4.isAlive()); //wait till game over //
-	        		//System.out.println("P:");
-	        		//proc.
+	        		
 					int sel = 0;					
 	        		//TODO who won
-	        		//give client a board object? 
 	        		adaptedCands.add(new Float[] {gc[sel].weight_x, gc[sel].weight_y, gc[sel].weight_z});
 	        		//System.out.println(); return value of server?
 	        		//while(proc.isAlive());

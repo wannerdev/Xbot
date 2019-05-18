@@ -35,6 +35,8 @@ public class GameTree {
 
 		} else {
 			throw new Exception("myPossibleMoves.size() <0 Game Over - All stones Blocked (If moves possible check calcfreemoves)");
+			//System.err.println
+			//return null;
 		}
 	}
 }
