@@ -8,7 +8,7 @@ public class Stone implements Cloneable {
 	byte x, y, player;
 	public boolean inStack;
 	public boolean isScored;
-	
+	public int hasJumped = 0;
 	Stone(byte x, byte y, byte player){
 		this.x = x;
 		this.y = y;

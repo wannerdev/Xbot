@@ -145,7 +145,7 @@ public class MinMax {
 																											// in stack
 																											// or
 				freeStones++;
-				jumps += conf.stones[i].canJump(bo);
+				jumps += (conf.stones[i].canJump(bo)+conf.stones[i].hasJumped*2);
 			}
 		}
 

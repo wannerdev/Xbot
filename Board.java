@@ -142,9 +142,11 @@ public class Board {
 
 		Vector2 moveDir = new Vector2(0, 0);
 		int howManyFields = 1;
-		int jmp = this.getStoneAtKoord(move.x, move.y).canJump(this);
+		Stone movingStone  = this.getStoneAtKoord(move.x, move.y);
+		int jmp = movingStone.canJump(this);
 		if (jmp > 0) {
 			howManyFields = jmp * 2; // if we can jump we have to jump.
+			movingStone.hasJumped = jmp;
 		}
 		int x = move.x;
 		int y = move.y;
