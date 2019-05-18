@@ -14,15 +14,16 @@ import java.util.Set;
 import lenz.htw.sawhian.Server;
 
 public class Select {
-	//static float weight_x = 0.5f, weight_y = 0.25f, weight_z = 0.25f; //arbitrary default values
-	static Float[] weights= {0.5f,0.25f,0.25f, 1f};
+	//static float weight_x = 0.5f, weight_y = 0.25f, weight_z = 0.25f; +quality //arbitrary default values
+	static Float[] weights= {0.5f,0.25f,0.25f, 0f};
 	static boolean lock = true;
 	//Not WORKING ATM
 	
 	public static void main(String[] args) {			
 		load();		//from filesystem
 		
-		int quali[]= new int[12];
+		//set base quality
+		int quali[]= {0,0,0,0,0,0,0,0,0,0,0,0};
 		//Candidates
 		Set<Float[]> candidates = new HashSet<Float[]>();
 		Set<Float[]> adaptedCands = new HashSet<Float[]>();
@@ -42,7 +43,6 @@ public class Select {
     		//evaluation
     		int counter = 0;
     		String again = "y";
-    		int winner=-1;
         	while( it.hasNext() && adaptedCands.size() != 0 && again!="n"){
         			Tserver srv= new Tserver();
 	        		tsrv = new Thread (srv,"Server");
@@ -80,39 +80,68 @@ public class Select {
 	        		//TODO who won
 					sel = srv.getWinner();
 					srv.stop();
-					System.out.println("getting winner:"+winner);
-	        		adaptedCands.add(new Float[] {gc[sel].weight_x, gc[sel].weight_y, gc[sel].weight_z});
+					System.out.println("getting winner:"+sel);
+					Float[] winner = new Float[] {gc[sel].weight_x, gc[sel].weight_y, gc[sel].weight_z,0f}; 
+	        		if(!adaptedCands.add(winner)) {
+	        			//if already in set increase quality
+	        			winner[3]++;
+	        			//quali[(sel+1)*(counter+1)]=quali[sel*(counter+1)]+1;
+	        		}
 	        		//System.out.println(); return value of server?	        		
 	        		counter++;
+	        		//Stop threads
+	        		gc[0].stop();
+	        		gc[1].stop();
+	        		gc[2].stop();
+	        		gc[3].stop();
 	        		
 	        		//all candidates played at least once
 	        		if(counter == 3) {
+	        			counter=0;
 	        			//recombination
 	        			candidates.removeAll(candidates);//loosers die
 	        			it = adaptedCands.iterator();
-	        			while( it.hasNext() ) { //mutate
+	        			while( it.hasNext() ) { //mutate //should be 4 3 winners one loaded(default or parent)
 	        				Float[] candi = it.next();
-	        							//Range ist um den wert herum maximal einfach 
+	        				//Range ist um den wert herum maximal einfach +- 0.2
 	        				candi[0] = (float) ((float) candi[0]+((0.2)*Math.random()-0.2*Math.random()));
 	        				candi[1]= (float) ((float) candi[1]+((0.2)*Math.random()-0.2*Math.random()));
 	        				candi[2]= (float) ((float) candi[2]+((0.2)*Math.random()-0.2*Math.random()));
-	        				candi[3]++;
+	        				candi[3]= 1f; //qualität 1 da mutated winner
 	        				
-	        				candidates.add(candi); //refill candidates with winners  
+	        				candidates.add(candi); //refill candidates with mutated winners  
 	        			}
-	        			//and use one winner as test?
-	        			refill(candidates);
+	        			getBest(adaptedCands);
+	        			candidates.addAll(adaptedCands); //fill with real winners
+	        			candidates=refill(candidates); //fill emptyslots
 	        	        save();
 	        			System.out.println("Anothertime? y/n");
 	        			Scanner in = new Scanner(System.in);
 	        			int i = in.nextInt();
 	        			again = in.next();
 	        			if (again.equals("n"))break;
+	        			byte b[] = null;
+	        			try {
+							System.in.read(b);
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 	        		}
 	        	}
         	}
         }
 	
+	private static void getBest(Set<Float[]> adaptedCands) {
+		Float[] cache= {0f,0f,0f,0f};
+		for(Float[] win : adaptedCands) {
+			if(win[3]> cache[3]) {
+				cache= win;
+			}
+		}
+		Select.weights= cache;
+	}
+
 	private static Set<Float[]> firstfill(Set<Float[]> cands) {
 		for(int i=0; i < 12; i++) {
 			cands.add(new Float[] {(float) (0.01f+Math.random()),(float) ((float) 0.01f+(Math.random())),(float) ((float) 0.01f+Math.random()),0f});
@@ -121,8 +150,9 @@ public class Select {
 	}
 	
 	private static Set<Float[]> refill(Set<Float[]> winners) {
+		//winners should be max 4
 		for(int i=0; i < 12-winners.size(); i++) {
-			winners.add(new Float[] {(float) (Math.random()),(float) (Math.random()),(float) (Math.random()),0f});
+			winners.add(new Float[] {(float) (0.01f+Math.random()),(float) (0.01f+Math.random()),(float) (0.01f+Math.random()),0f});
 		}
 		return winners;
 	}
@@ -137,6 +167,7 @@ public class Select {
 	        	weights[0] = Float.valueOf(scanner.next());
 	        	weights[1] = Float.valueOf(scanner.next());
 	        	weights[2] = Float.valueOf(scanner.next());
+	        	weights[3] = Float.valueOf(scanner.next());
 	        }
 	        scanner.close();
 		} catch (FileNotFoundException e1) {
@@ -154,6 +185,8 @@ public class Select {
 	        sb.append(weights[1]);
 	        sb.append(';');
 	        sb.append(weights[2]);
+	        sb.append(';');
+	        sb.append(weights[3]);
 	        sb.append(';');
 	        sb.append('\n');
 	        pw.write(sb.toString());
