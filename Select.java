@@ -88,10 +88,6 @@ public class Select {
 	        		//all candidates played at least once
 	        		if(counter == 3) {
 	        			//recombination
-	        			
-	        			//adaptedCands.forEach((Integer[] cand)-> X++);
-	        			int j=0, l=0, k=0;
-	        			
 	        			candidates.removeAll(candidates);//loosers die
 	        			it = adaptedCands.iterator();
 	        			while( it.hasNext() ) { //mutate
@@ -102,10 +98,10 @@ public class Select {
 	        				candi[2]= (float) ((float) candi[2]+((0.2)*Math.random()-0.2*Math.random()));
 	        				candi[3]++;
 	        				
-	        				candidates.add(candi); //refill candidates  
+	        				candidates.add(candi); //refill candidates with winners  
 	        			}
 	        			//and use one winner as test?
-	        			
+	        			refill(candidates);
 	        	        save();
 	        			System.out.println("Anothertime? y/n");
 	        			Scanner in = new Scanner(System.in);
@@ -119,14 +115,14 @@ public class Select {
 	
 	private static Set<Float[]> firstfill(Set<Float[]> cands) {
 		for(int i=0; i < 12; i++) {
-			cands.add(new Float[] {(float) (Math.random()),(float) (Math.random()*100),(float) (Math.random()*100)});
+			cands.add(new Float[] {(float) (0.01f+Math.random()),(float) ((float) 0.01f+(Math.random())),(float) ((float) 0.01f+Math.random()),0f});
 		}
 		return cands;
 	}
 	
-	private static Set<Float[]> mutate(Set<Float[]> winners) {
-		for(int i=0; i < 12; i++) {
-			winners.add(new Float[] {(float) (Math.random()),(float) (Math.random()*100),(float) (Math.random()*100)});
+	private static Set<Float[]> refill(Set<Float[]> winners) {
+		for(int i=0; i < 12-winners.size(); i++) {
+			winners.add(new Float[] {(float) (Math.random()),(float) (Math.random()),(float) (Math.random()),0f});
 		}
 		return winners;
 	}
