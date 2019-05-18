@@ -8,11 +8,11 @@ import lenz.htw.sawhian.Move;
 public class MinMax {
 
 	private Move[] savedMove = new Move[4];
-	private Move backUpMove = null;
+	private Move backUpMove[] = new Move[4];
 	private int targetDepth = 2;
 	public int[] alive;
 	public Board board;
-	public final int maxsum = 7;
+	public final int maxsum = 5;
 	public final int maxp = 7;
 
 	// public int weight1;
@@ -33,16 +33,14 @@ public class MinMax {
 		System.out.println("Player" + player + ", Rating of the move:" + rating[player]);
 		System.out.println("Rating of All" + ":" + rating[0] + " " + rating[1] + " " + rating[2] + " " + rating[3]);
 		if (savedMove[player] == null) {
-			System.out.println("BACKUPMOVE: X = " + backUpMove.x + " || Y = " + backUpMove.y);
-			return backUpMove;
-		}else {
-			
-			System.out.println("MOVE: X = " + savedMove[player].x + " || Y = " + savedMove[player].y);
+			System.out.println("BACKUPMOVE: X = " + backUpMove[player].x + " || Y = " + backUpMove[player].y);
+			return backUpMove[player];
+		} else {
+
+			System.out.println("MAXN MOVE: X = " + savedMove[player].x + " || Y = " + savedMove[player].y);
 			return savedMove[player];
 		}
-	
-		
-	
+
 	}
 
 	public int[] maxN(int player, int depth) throws Exception {
@@ -182,7 +180,15 @@ public class MinMax {
 			}
 		}
 		// TODO change into something better
-		return freeStones + jumps;// bo.getScore(player);
+
+		if (conf.stackSto[player] > 0) {
+
+			return freeStones + jumps + bo.getScore(player);
+		} else {
+			return (jumps*2) + bo.getScore(player);
+
+		}
+
 	}
 
 	int[] Shallow(Config Node, int Player, int Bound, int depth) throws Exception {
@@ -190,30 +196,31 @@ public class MinMax {
 
 		// get all possible moves that can be made for this player
 		List<Move> posMoves = board.calcFreeMoves(Player, board);
+
 		if (Node.isTerminal() || posMoves.size() == 0 || depth == 0) {
 
 			/// this should indicate best or worst case scenarios ( iE win or lose)
 			return rateAll(Player);
 		}
-
 		// get the first child node
 		Move firstMove = posMoves.get(0);
 		// create cache and make the first possible move
 		Config cache;
 		cache = board.getStateConfig().clone();
 		board.makeMove(firstMove);
-		// populate the ratings table by evaluatibg the first leaf node
-		depth--;
-		int Best[] = Shallow(board.getStateConfig(), nextPlayer(Player), maxsum, depth);
+		// populate the ratings table by evaluating the first leaf node
+		
+		int Best[] = Shallow(board.getStateConfig(), nextPlayer(Player), maxsum, depth-1);
 		// reset the board so that it can be used again
 		board.setStateConfig(cache);
 		int i = 0;
-		// now for the remaining child nodes
+		// now for the remaining child nodes	board.setStateConfig(cache);
+
 		for (Move move : posMoves) {
 			if (i != 0) {
 
 				if (Best[Player] >= Bound) {
-					if (move.player == Player) {
+					if (move.player == Player && depth == targetDepth*3) {
 						savedMove[Player] = move;
 					}
 					return Best;
@@ -221,19 +228,25 @@ public class MinMax {
 
 				cache = board.getStateConfig().clone();
 				board.makeMove(move);
-				int Current[] = Shallow(board.getStateConfig(), nextPlayer(Player), maxsum - Best[Player], depth);
-				if (Current[Player] >= Best[Player]) {
-					backUpMove = move;
+
+				int Current[] = Shallow(board.getStateConfig(), nextPlayer(Player), maxsum - Best[Player], depth-1);
+
+				if (Current[Player] >  Best[Player]) {
+					
+				    backUpMove[Player] = move;
+				
 					Best = Current;
+
 				}
 				// reset the board so that it can be used again
 				board.setStateConfig(cache);
 			}
 
 			i++;
+		
 
 		}
-
+       
 		return Best;
 
 	}
