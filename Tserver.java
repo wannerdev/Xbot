@@ -3,7 +3,7 @@ package Xbot;
 import lenz.htw.sawhian.Server;
 
 public class Tserver implements Runnable{
-	int winner=-1;
+	int winner=-100;
 	private volatile boolean exit = false;
 	
 	@Override
@@ -13,8 +13,9 @@ public class Tserver implements Runnable{
 			System.out.println("Tserver started:");
 			winner= Server.runOnceAndReturnTheWinner(2);
 			TestRun.winner = winner;
-			Select.lock =false;
+			//Select.lock =false;
 			System.out.println("\nTserver Winner:"+winner);
+			exit = true;
 		}
 	}
 	
@@ -23,6 +24,6 @@ public class Tserver implements Runnable{
 	}
 	
 	public void stop(){
-        exit = true;
+      
     }
 }

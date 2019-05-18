@@ -16,6 +16,7 @@ public class client implements Runnable {
 
 	float weight_x = 0.5f, weight_y = 0.25f, weight_z = 0.25f; // arbitrary default values
 	private volatile boolean exit = false;
+	public boolean dead = false;
 	// Laptop Aufl�sung server
 	// java -Djava.library.path=C:\Users\Johannes\Dropbox\Java\sawhian\lib\native
 	// -jar C:\Users\Johannes\Dropbox\Java\sawhian\sawhian.jar 4 1600 900
@@ -36,7 +37,11 @@ public class client implements Runnable {
 
 	@Override
 	public void run() {
-		while (!exit) {
+		
+			
+			if (dead) {
+				return;
+			}
 			Board b = new Board();
 			int myNumber = -1;
 			try {
@@ -56,10 +61,10 @@ public class client implements Runnable {
 					// a move
 					// ich bin dran
 					if (move == null) {
-						System.out.println("Allmoves:" + b.calcFreeMoves(myNumber, b).toString());
+						//System.out.println("Allmoves:" + b.calcFreeMoves(myNumber, b).toString());
 						Move lastmove = null;
 						if (myNumber == 0) {
-							lastmove = tree.MultiMax(myNumber, b);
+							lastmove = tree.randomMove(myNumber, b);
 						} else {
 							lastmove = tree.randomMove(myNumber, b);
 						}
@@ -71,9 +76,9 @@ public class client implements Runnable {
 							throw new Exception("Game over:" + b.getScores());
 						// baue Zug in meine spielfeldrepr�sentation ein
 						b.makeMove(move);
-						System.out.println("Anzahl steine: " + b.getStateConfig().ptr);
-						System.out.println(b.getStateConfig().toString());
-						System.out.println("MOVE: X = " + move.x + " || Y = " + move.y);
+						//System.out.println("Anzahl steine: " + b.getStateConfig().ptr);
+						//System.out.println(b.getStateConfig().toString());
+						//System.out.println("MOVE: X = " + move.x + " || Y = " + move.y);
 					}
 				}
 				// TODO recognize valid game end.
@@ -86,10 +91,11 @@ public class client implements Runnable {
 				System.err.println("Player" + myNumber + " Exception: \n" + e.getLocalizedMessage());
 			}
 		}
-	}
+	
 	
 	public void stop(){
         exit = true;
+        dead = true;
     }
 
 }

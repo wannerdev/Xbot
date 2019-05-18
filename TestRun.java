@@ -4,8 +4,8 @@ import lenz.htw.sawhian.Server;
 
 public class TestRun {
 
-	static int winner = -1;
-
+	static int winner = -100;
+    static int count =0 ;
 	public static void main(String[] args) {
 		int q[] = new int[10]; // the quality values of the subjects
 		try {
@@ -22,54 +22,32 @@ public class TestRun {
 					clientThreads[i] = new Thread(clients[i], "client"+i);// 0
 					clientThreads[i].start();
 				}
-				/*clientThreads[0] = new Thread(new client(), "client0");// 0
-				clientThreads[1]  = new Thread(new client(), "client1");// 1
-				clientThreads[2]  = new Thread(new client(), "client2");// 2
-				clientThreads[3]  = new Thread(new client(), "client3");// 3
-				clientThreads[0].start();
-				clientThreads[1].start();
-				clientThreads[2].start();
-				clientThreads[3].start();*/
+				
 				System.out.println("Winner?:" + winner);
 				int aliveCount = 4;
-				while (aliveCount>0 && winner == -1) {
-					aliveCount = 4;
+				while (winner == -100) {
+					
                     for(int i = 0; i < 4 ; i++) {
-                    	
-                    	if (!clientThreads[i].isAlive()) {
-                    		
-                    		aliveCount--;
-                    	}
+                    	clientThreads[i].isAlive();            	
                     }
-					winner = srv.getWinner();
-
 				};
 				System.out.println(tsrv.getName());
 				System.out.println("Winner:" + winner);
-				boolean flag = true;
-				for(int i = 0; i < 4 ; i++) {
+			
+				System.out.println("Count:" + count);
 				
-					clients[i].stop();
-				}
+				boolean flag = true;
 				srv.stop();
-				while (flag);
+				long jetzt = System.currentTimeMillis();
+        		while(System.currentTimeMillis() > jetzt +2000);//warte 2sek
+				count++;
+				winner = -100;
+				while(count>2);
 					
-				// q[winner]++;
-
-				// start 4threads mit den ersten vier subjects
-
-				// increase q of winner and decrease q of loosers
+			
 
 			}
-			/*
-			 * client[] gc = new client[3]; gc[0] = new client(cand1[0],cand1[1],cand1[2]);
-			 * gc[1] = new client(cand2[0],cand2[1],cand2[2]); gc[2] = new
-			 * client(cand3[0],cand3[1],cand3[2]);
-			 * 
-			 * t1 = new Thread(gc[0]); t2 = new Thread(gc[1]); t3 = new Thread(gc[2]);
-			 * 
-			 * t1.start(); t2.start(); t3.start();
-			 */
+	
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
