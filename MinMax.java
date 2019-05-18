@@ -7,11 +7,12 @@ import lenz.htw.sawhian.Move;
 
 public class MinMax {
 
-	private Move savedMove = null;
+	private Move[] savedMove = new Move[4];
+	private Move backUpMove = null;
 	private int targetDepth = 2;
 	public int[] alive;
 	public Board board;
-	public final int maxsum = 25;
+	public final int maxsum = 7;
 	public final int maxp = 7;
 
 	// public int weight1;
@@ -25,14 +26,23 @@ public class MinMax {
 
 	public Move run(int player) throws Exception {
 		int[] rating = new int[4];
+
 		// Multiply by 3 because we are 4 players
-		rating = maxN(player, targetDepth * 3);
+		rating = Shallow(board.getStateConfig(), player, maxsum, targetDepth * 3); // maxN(player, targetDepth * 3);
 
 		System.out.println("Player" + player + ", Rating of the move:" + rating[player]);
-		System.out.println("MOVE: X = " + savedMove.x + " || Y = " + savedMove.y);
 		System.out.println("Rating of All" + ":" + rating[0] + " " + rating[1] + " " + rating[2] + " " + rating[3]);
-
-		return savedMove;
+		if (savedMove[player] == null) {
+			System.out.println("BACKUPMOVE: X = " + backUpMove.x + " || Y = " + backUpMove.y);
+			return backUpMove;
+		}else {
+			
+			System.out.println("MOVE: X = " + savedMove[player].x + " || Y = " + savedMove[player].y);
+			return savedMove[player];
+		}
+	
+		
+	
 	}
 
 	public int[] maxN(int player, int depth) throws Exception {
@@ -53,7 +63,7 @@ public class MinMax {
 		for (Move move : posMoves) {
 			// save the board to the cache
 			cache = board.getStateConfig().clone();
-			
+
 			// make the move to create new config / Node
 			board.makeMove(move);
 			// check to see if Node is Terminal
@@ -71,8 +81,8 @@ public class MinMax {
 			ratingList.add(ratings);
 			// if i am at the root node
 			if (depth == targetDepth * 3) {
-				if (ratings[player] > ratingList.get(j)[player] || savedMove == null) {
-					savedMove = move;
+				if (ratings[player] > ratingList.get(j)[player] || savedMove[player] == null) {
+					savedMove[player] = move;
 				}
 			}
 			// reset config
@@ -144,7 +154,7 @@ public class MinMax {
 		Config conf = board.getStateConfig();
 		Board bo = board;
 		for (int i = player * 5; i < (player + 1) * 5; i++) { // for all stones of this player
-			if (conf.stones[i].inStack && (conf.stones[i].x != 7 || conf.stones[i].x != 7)) { // Stone not in stack or
+			if (!conf.stones[i].inStack && (conf.stones[i].x != 7 || conf.stones[i].x != 7)) { // Stone not in stack or
 				freeStones++;
 				jumps += conf.stones[i].canJump(bo);
 			}
@@ -153,43 +163,39 @@ public class MinMax {
 			int secondPlayer = nextPlayer(player);
 			int thirdPlayer = nextPlayer(secondPlayer);
 			int fourthPlayer = nextPlayer(thirdPlayer);
-			//TODO if all my stones are blocked and nobody has won yet i lost,?
-			
-			if (bo.getScore(player) < bo.getScore(secondPlayer)
-					|| bo.getScore(player) < bo.getScore(thirdPlayer)
+			// TODO if all my stones are blocked and nobody has won yet i lost,?
+
+			if (bo.getScore(player) < bo.getScore(secondPlayer) || bo.getScore(player) < bo.getScore(thirdPlayer)
 					|| bo.getScore(player) < bo.getScore(fourthPlayer)) {
 				// if anybody has a higher score
 				return Integer.MIN_VALUE; // lost
-			} else if (bo.getScore(player) > bo.getScore(secondPlayer) 
-					&& bo.getScore(player) > bo.getScore(thirdPlayer)
+			} else if (bo.getScore(player) > bo.getScore(secondPlayer) && bo.getScore(player) > bo.getScore(thirdPlayer)
 					&& bo.getScore(player) > bo.getScore(fourthPlayer)) {
 				// if i have the highest score
 				return Integer.MAX_VALUE; // Won
-				//if at least two people have the same score its a draw
+				// if at least two people have the same score its a draw
 			} else if (bo.getScore(player) == bo.getScore(secondPlayer)
 					|| bo.getScore(player) == bo.getScore(thirdPlayer)
-					|| bo.getScore(player) == bo.getScore(fourthPlayer)
-					) {
-				//TODO check
+					|| bo.getScore(player) == bo.getScore(fourthPlayer)) {
+				// TODO check
 				return 0; // Draw
 			}
 		}
 		// TODO change into something better
-		return bo.getScore(player);
+		return freeStones + jumps;// bo.getScore(player);
 	}
 
-	int[] Shallow(Config Node, int Player, int Bound,int depth) throws Exception {
+	int[] Shallow(Config Node, int Player, int Bound, int depth) throws Exception {
 		// add something here so that we can check if a player has a score = 7
 
-		int maxSum = 25;
 		// get all possible moves that can be made for this player
 		List<Move> posMoves = board.calcFreeMoves(Player, board);
-		if (Node.isTerminal()||depth == 0 || posMoves == null) {
+		if (Node.isTerminal() || posMoves.size() == 0 || depth == 0) {
 
 			/// this should indicate best or worst case scenarios ( iE win or lose)
 			return rateAll(Player);
 		}
-	
+
 		// get the first child node
 		Move firstMove = posMoves.get(0);
 		// create cache and make the first possible move
@@ -198,7 +204,7 @@ public class MinMax {
 		board.makeMove(firstMove);
 		// populate the ratings table by evaluatibg the first leaf node
 		depth--;
-		int Best[] = Shallow(board.getStateConfig(), nextPlayer(Player), maxSum,depth);
+		int Best[] = Shallow(board.getStateConfig(), nextPlayer(Player), maxsum, depth);
 		// reset the board so that it can be used again
 		board.setStateConfig(cache);
 		int i = 0;
@@ -206,16 +212,18 @@ public class MinMax {
 		for (Move move : posMoves) {
 			if (i != 0) {
 
-				if (Best[Player]>= Bound) {
-					savedMove = move;
+				if (Best[Player] >= Bound) {
+					if (move.player == Player) {
+						savedMove[Player] = move;
+					}
 					return Best;
 				}
 
 				cache = board.getStateConfig().clone();
-				board.makeMove(firstMove);
-				int Current[] = Shallow(board.getStateConfig(), nextPlayer(Player), maxSum-Best[Player],depth);
+				board.makeMove(move);
+				int Current[] = Shallow(board.getStateConfig(), nextPlayer(Player), maxsum - Best[Player], depth);
 				if (Current[Player] >= Best[Player]) {
-
+					backUpMove = move;
 					Best = Current;
 				}
 				// reset the board so that it can be used again
