@@ -11,16 +11,16 @@ public class GameTree {
 		return li.get(0);
 	}
 	
-	public Move MultiMax(int player, Board b) throws Exception{
-		MinMax alg = new MinMax(b.getStateConfig().clone());
+	public Move MultiMax(int player, Board b, float[] weights) throws Exception{
+		MinMax alg = new MinMax(b.getStateConfig().clone(),weights);
 		Move m = alg.run(player);
 		//If our Alg produces invalid moves
 		if(!Board.isValidMove(m, b)) {
-			System.err.println("MaxN produces invalid move :: MOVE ("+m.x+" || "+ m.y+")");
+		//	System.err.println("MaxN produces invalid move :: MOVE ("+m.x+" || "+ m.y+")");
 			m = calculateOneMove(player, b);
 		}else {
 			
-				System.out.println("MaxN produces valid move :: MOVE ("+m.x+" || "+ m.y+")");
+				//System.out.println("MaxN produces valid move :: MOVE ("+m.x+" || "+ m.y+")");
 				
 			
 		}

@@ -16,14 +16,13 @@ public class MinMax {
 	public final int maxsum = 21;
 	public final int maxp = 7;
 	private int prune = 0;
+	private float[] weights;
 
-	// public int weight1;
-	// public int weight2;
-	// public int weight3;
 
-	MinMax(Config conf) {
+	MinMax(Config conf, float[] weights) {
 		this.board = new Board();
 		this.board.setStateConfig(conf);
+		this.weights = weights;
 	}
 
 	public Move run(int player) throws Exception {
@@ -32,15 +31,15 @@ public class MinMax {
 		// Multiply by 3 because we are 4 players
 		rating = Shallow(board.getStateConfig(), player, maxsum, targetDepth * 3); // maxN(player, targetDepth * 3);
 
-		System.out.println("Player" + player + ", Rating of the move:" + rating[player]);
-		System.out.println("Rating of All" + ":" + rating[0] + " " + rating[1] + " " + rating[2] + " " + rating[3]);
-		System.out.println("MAXN pruned (" + prune + ") times!");
+		//System.out.println("Player" + player + ", Rating of the move:" + rating[player]);
+		//System.out.println("Rating of All" + ":" + rating[0] + " " + rating[1] + " " + rating[2] + " " + rating[3]);
+		//System.out.println("MAXN pruned (" + prune + ") times!");
 		if (savedMove[player] == null) {
-			System.out.println("BACKUPMOVE: X = " + backUpMove[player].x + " || Y = " + backUpMove[player].y);
+			//System.out.println("BACKUPMOVE: X = " + backUpMove[player].x + " || Y = " + backUpMove[player].y);
 			return backUpMove[player];
 		} else {
 
-			System.out.println("MAXN MOVE: X = " + savedMove[player].x + " || Y = " + savedMove[player].y);
+			//System.out.println("MAXN MOVE: X = " + savedMove[player].x + " || Y = " + savedMove[player].y);
 			return savedMove[player];
 		}
 
@@ -143,10 +142,9 @@ public class MinMax {
 		int jumps = 0;
 		Config conf = board.getStateConfig();
 		Board bo = board;
-		int weightJump = (player == 0) ? 2 : 1;
-		int weightScore = (player == 0) ? 3 : 1;
-		int weightFree = (player == 0) ? 7 : 0;
-		int weighthasJumped = (player == 0) ? 2: 0;
+		float weightJump = 2*weights[0];
+		float weightScore = 2*weights[1];
+		float weighthasJumped =  2 * weights[2];
 		for (int i = player * 7; i < (player + 1) * 7; i++) { // for all stones of this player
 			if (!conf.stones[i].inStack && !conf.stones[i].isScored && !conf.stones[i].isBlocked(board)) { // Stone not
 																											// in stack
@@ -194,13 +192,10 @@ public class MinMax {
 		}
 
 	
-		if (conf.stackSto[player] > weightFree) {
+	        // TODO int to float
+			return (int)((jumps * weightJump) + (bo.getScore(player) * weightScore));
 
-			return freeStones + jumps + (bo.getScore(player) * weightScore);
-		} else {
-			return (jumps * weightJump) + (bo.getScore(player) * weightScore);
-
-		}
+		
 
 	}
 
@@ -252,8 +247,8 @@ public class MinMax {
 				Current = Shallow(board.getStateConfig(), nextPlayer(Player), maxsum - Best[Player], depth - 1);
 				if (depth == targetDepth * 3) {
 
-					System.out.println("Move " + i + " Score:: " + Current[0] + " " + Current[1] + " " + Current[2]
-							+ " " + Current[3]);
+					//System.out.println("Move " + i + " Score:: " + Current[0] + " " + Current[1] + " " + Current[2]
+						//	+ " " + Current[3]);
 
 				}
 				if (Current[Player] > Best[Player] && depth == targetDepth * 3) {
@@ -268,8 +263,8 @@ public class MinMax {
 			} else {
 				if (depth == targetDepth * 3) {
 
-					System.out.println(
-							"Move " + i + " Score:: " + Best[0] + " " + Best[1] + " " + Best[2] + " " + Best[3]);
+					
+					//System.out.println("Move " + i + " Score:: " + Best[0] + " " + Best[1] + " " + Best[2] + " " + Best[3]);
 
 				}
 
@@ -281,18 +276,18 @@ public class MinMax {
 		if (depth == targetDepth * 3) {
 			if (backUpMove[Player] == null && savedMove[Player] == null) {
 				savedMove[Player] = firstMove;
-				System.out.println("this is fucked");
+				//System.out.println("this is fucked");
 			} else if (backUpMove[Player] != null) {
 
 				if (!Board.isValidMove(backUpMove[Player], board)) {
 
-					System.out.println("this is fucked2");
+					//System.out.println("this is fucked2");
 				}
 			} else if (savedMove[Player] != null) {
 
 				if (!Board.isValidMove(savedMove[Player], board)) {
 
-					System.out.println("this is fucked3");
+					//System.out.println("this is fucked3");
 				}
 			}
 

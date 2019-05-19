@@ -29,14 +29,13 @@ public class Select {
 		Set<Float[]> adaptedCands = new HashSet<Float[]>();
 		adaptedCands.add(Select.weights);
     	candidates = firstfill(candidates);
-		
+    	int counter = 0;
 
 		
         while(true) {
 
     		Iterator<Float[]> it = candidates.iterator();
-        	System.out.println(adaptedCands.size());
-        	System.out.println(it.hasNext());
+    
         	//Server 
         	Thread tsrv;
         	//clients
@@ -45,7 +44,7 @@ public class Select {
     		Thread t3;
     		Thread t4;
     		//evaluation
-    		int counter = 0;
+    	
     		String again = "y";
         	while( it.hasNext() && adaptedCands.size() != 0 && again!="n"){
         			Tserver srv= new Tserver();
@@ -89,8 +88,8 @@ public class Select {
 	        		//TODO who won
 					sel = (srv.getWinner()<0)?  srv.getWinner(): srv.getWinner()-1;
 					srv.stop();
-					if(sel >0) {//valid significant game
-						System.out.println("getting winner:"+sel);
+					if(sel >=0) {//valid significant game
+						System.out.println("winner is :"+sel);
 						long past = System.currentTimeMillis();
 		        		while(System.currentTimeMillis() > past +2000);//warte 2sek
 						Float[] winner = new Float[] {gc[sel].weight_x, gc[sel].weight_y, gc[sel].weight_z,0f}; 
@@ -111,6 +110,7 @@ public class Select {
 	        		gc[3].stop();*/
 	        		
 	        		//all candidates played at least once
+	        		System.out.println("COUNTER :: "+counter);
 	        		if(counter == 3) {
 	        			counter=0;
 	        		
@@ -120,13 +120,33 @@ public class Select {
 	        			while( it.hasNext() ) { //mutate //should be 4 3 winners one loaded(default or parent)
 	        				Float[] candi = it.next();
 	        				//Range ist um den wert herum maximal einfach +- 0.2
-	        				candi[0] = (float) ((float) candi[0]+((0.2)*Math.random()-0.2*Math.random()));
-	        				candi[1]= (float) ((float) candi[1]+((0.2)*Math.random()-0.2*Math.random()));
-	        				candi[2]= (float) ((float) candi[2]+((0.2)*Math.random()-0.2*Math.random()));
+	        				candi[0] = (float) ((float) candi[0]+((0.02)*Math.random()-0.01*Math.random()));
+	        				if (candi[0]<0) {
+	        					candi[0] = 0f;
+	        				}
+	        				if (candi[0]>1) {
+	        					candi[0] = 1f;
+	        				}
+	        				candi[1]= (float) ((float) candi[1]+((0.02)*Math.random()-0.01*Math.random()));
+	        				if (candi[1]<0) {
+	        					candi[1] = 0f;
+	        				}
+	        				if (candi[1]>1) {
+	        					candi[1] = 1f;
+	        				}
+	        				candi[2]= (float) ((float) candi[2]+((0.02)*Math.random()-0.01*Math.random()));
+	        				if (candi[2]<0) {
+	        					candi[2] = 0f;
+	        				}
+	        				if (candi[2]>1) {
+	        					candi[2] = 1f;
+	        				}
 	        				candi[3]= 1f; //qualität 1 da mutated winner
 	        				
 	        				candidates.add(candi); //refill candidates with mutated winners  
 	        			}
+	        			
+	        			
 	        			getBest(adaptedCands);
 	        			candidates.addAll(adaptedCands); //fill with real winners
 	        			candidates=refill(candidates);
@@ -195,6 +215,7 @@ public class Select {
 
 	public static void save() {
 		try {
+			System.out.println("saving to disk");
 			PrintWriter pw = new PrintWriter(new File("weights.csv"));
 	        StringBuilder sb = new StringBuilder();
 	        sb.append(weights[0]);
@@ -207,6 +228,7 @@ public class Select {
 	        sb.append(';');
 	        pw.write(sb.toString());
 	        pw.close();
+	        
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			throw new AssertionError();
