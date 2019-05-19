@@ -20,7 +20,7 @@ public class Select {
 	//Not WORKING ATM
 	
 	public static void main(String[] args) {			
-		load();		//from filesystem
+    	load();		//from filesystem
 		
 		//set base quality
 		int quali[]= {0,0,0,0,0,0,0,0,0,0,0,0};
@@ -28,11 +28,15 @@ public class Select {
 		Set<Float[]> candidates = new HashSet<Float[]>();
 		Set<Float[]> adaptedCands = new HashSet<Float[]>();
 		adaptedCands.add(Select.weights);
+    	candidates = firstfill(candidates);
 		
-		candidates = firstfill(candidates);
-		Iterator<Float[]> it = candidates.iterator();
+
 		
         while(true) {
+
+    		Iterator<Float[]> it = candidates.iterator();
+        	System.out.println(adaptedCands.size());
+        	System.out.println(it.hasNext());
         	//Server 
         	Thread tsrv;
         	//clients
@@ -61,43 +65,55 @@ public class Select {
 	        		gc[1] = new client(cand2[0],cand2[1],cand2[2]);
 	        		gc[2] = new client(cand3[0],cand3[1],cand3[2]);
 	        		gc[3] = new client(cand4[0],cand4[1],cand4[2]);
-	
-	        		t1 = new Thread(gc[0]);
-	        		t2 = new Thread(gc[1]);
-	        		t3 = new Thread(gc[2]);
-	        		t4 = new Thread(gc[3]);
+	                
+	        		Thread[] clientThread = new Thread[4];
+	        		clientThread[0] = new Thread(gc[0]);
+	        		clientThread[1] = new Thread(gc[1]);
+	        		clientThread[2] = new Thread(gc[2]);
+	        		clientThread[3] = new Thread(gc[3]);
 	        		
-	        		t1.start();
-	        		t2.start();
-	        		t3.start();
-	        		t4.start();
+	        		clientThread[0].start();
+	        		clientThread[1].start();
+	        		clientThread[2].start();
+	        		clientThread[3].start();
 
-	        		long jetzt = System.currentTimeMillis();
-	        		while(System.currentTimeMillis() > jetzt +2000);//warte 2sek
-	        		while(lock);
+	        		
+	        		while (lock) {
+						
+	                    for(int i = 0; i < 4 ; i++) {
+	                    	clientThread[i].isAlive();            	
+	                    }
+					};
 					int sel = 0;
 					System.out.println("getting winner");
 	        		//TODO who won
-					sel = srv.getWinner();
+					sel = (srv.getWinner()<0)?  srv.getWinner(): srv.getWinner()-1;
 					srv.stop();
-					System.out.println("getting winner:"+sel);
-					Float[] winner = new Float[] {gc[sel].weight_x, gc[sel].weight_y, gc[sel].weight_z,0f}; 
-	        		if(!adaptedCands.add(winner)) {
-	        			//if already in set increase quality
-	        			winner[3]++;
-	        			//quali[(sel+1)*(counter+1)]=quali[sel*(counter+1)]+1;
-	        		}
-	        		//System.out.println(); return value of server?	        		
-	        		counter++;
-	        		//Stop threads
+					if(sel >0) {//valid significant game
+						System.out.println("getting winner:"+sel);
+						long past = System.currentTimeMillis();
+		        		while(System.currentTimeMillis() > past +2000);//warte 2sek
+						Float[] winner = new Float[] {gc[sel].weight_x, gc[sel].weight_y, gc[sel].weight_z,0f}; 
+		        		if(!adaptedCands.add(winner)) {
+		        			//if already in set increase quality
+		        			winner[3]++;
+		        			//quali[(sel+1)*(counter+1)]=quali[sel*(counter+1)]+1;
+		        		}
+		        		//System.out.println(); return value of server?	        		
+		        		
+					}
+					counter++;
+	        		lock = true;
+	        		/*Stop threads
 	        		gc[0].stop();
 	        		gc[1].stop();
 	        		gc[2].stop();
-	        		gc[3].stop();
+	        		gc[3].stop();*/
 	        		
 	        		//all candidates played at least once
 	        		if(counter == 3) {
 	        			counter=0;
+	        		
 	        			//recombination
 	        			candidates.removeAll(candidates);//loosers die
 	        			it = adaptedCands.iterator();
@@ -113,20 +129,21 @@ public class Select {
 	        			}
 	        			getBest(adaptedCands);
 	        			candidates.addAll(adaptedCands); //fill with real winners
-	        			candidates=refill(candidates); //fill emptyslots
+	        			candidates=refill(candidates);
+	        			
 	        	        save();
-	        			System.out.println("Anothertime? y/n");
+	        			/*System.out.println("Anothertime? y/n");
 	        			Scanner in = new Scanner(System.in);
-	        			int i = in.nextInt();
+	        			
 	        			again = in.next();
 	        			if (again.equals("n"))break;
-	        			byte b[] = null;
+	        			/*byte b[]= new byte[30] ;
 	        			try {
 							System.in.read(b);
 						} catch (IOException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
-						}
+						}*/
 	        		}
 	        	}
         	}
@@ -188,7 +205,6 @@ public class Select {
 	        sb.append(';');
 	        sb.append(weights[3]);
 	        sb.append(';');
-	        sb.append('\n');
 	        pw.write(sb.toString());
 	        pw.close();
 		} catch (FileNotFoundException e) {

@@ -12,8 +12,8 @@ public class Tserver implements Runnable{
 			System.out.println("Server is running....."); 
 			System.out.println("Tserver started:");
 			winner= Server.runOnceAndReturnTheWinner(2);
-			TestRun.winner = winner;
-			//Select.lock =false;
+			//TestRun.winner = winner;
+			Select.lock =false;
 			System.out.println("\nTserver Winner:"+winner);
 			exit = true;
 		}
