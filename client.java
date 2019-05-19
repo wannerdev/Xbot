@@ -12,28 +12,45 @@ import javax.imageio.ImageIO;
 import lenz.htw.sawhian.Move;
 import lenz.htw.sawhian.net.*;
 
-public class client {
+public class client implements Runnable {
 
-	static float weight_x = 0.5f, weight_y = 0.25f, weight_z = 0.25f; //arbitrary default values
-
+	float weight_x = 0.5f, weight_y = 0.25f, weight_z = 0.25f; // arbitrary default values
+	private volatile boolean exit = false;
+	public boolean dead = false;
+	// Laptop Auflï¿½sung server
 	// java -Djava.library.path=C:\Users\Johannes\Dropbox\Java\sawhian\lib\native
 	// -jar C:\Users\Johannes\Dropbox\Java\sawhian\sawhian.jar 4 1600 900
-	// Laptop auflÃ¶sung server
 	// Desktop
-	// java -Djava.library.path=D:\Wichtig\Programmieren\Java\Xbot\sawhian\lib\native -jar D:\Wichtig\Programmieren\Java\Xbot\sawhian\sawhian.jar 4 1600 900
-	
-	// Man bekommt nur die position des steines nicht das Ziel da der Stein ja nur
-	// in eine Richtung kann
-	public static void main(String[] args) {
-			load();
+	// java
+	// -Djava.library.path=D:\Wichtig\Programmieren\Java\Xbot\sawhian\lib\native
+	// -jar D:\Wichtig\Programmieren\Java\Xbot\sawhian\sawhian.jar 4 1600 900
+
+	public client(Float weight_x, Float weight_y, Float weight_z) {
+		this.weight_x = weight_x;
+		this.weight_y = weight_y;
+		this.weight_z = weight_z;
+	}
+
+	public client() {
+		// TODO Auto-generated constructor stub
+	}
+
+	@Override
+	public void run() {
+		
+			
+			if (dead) {
+				return;
+			}
 			Board b = new Board();
-		try {
-			String logoh = "cybran";
-			BufferedImage logo = ImageIO.read(new File("src/Xbot/" +logoh + ".png"));
-			Integer num = (int) (Math.random() * 50);
-			NetworkClient client = new NetworkClient(null, "XBot" + num.toString() + "000", logo);
-			int myNumber = client.getMyPlayerNumber();
-			System.out.println("Player:" + myNumber);
+			int myNumber = -1;
+			try {
+				String logoh = "cybran";
+				BufferedImage logo = ImageIO.read(new File("src/Xbot/" + logoh + ".png"));
+				Integer num = (int) (Math.random() * 50);
+				NetworkClient client = new NetworkClient(null, "XBot" + num.toString() + "000", logo);
+				myNumber = client.getMyPlayerNumber();
+				System.out.println("Player:" + myNumber);
 
 			GameTree tree = new GameTree();
 			int x = 0, y = 0;
@@ -53,59 +70,49 @@ public class client {
 					client.sendMove(lastmove);
 					// x++;
 				} else {
-					// baue Zug in meine spielfeldrepräsentation ein
+					// baue Zug in meine spielfeldreprï¿½sentation ein
 					b.makeMove(move);
 					System.out.println(" Anzahl steine: " + b.getStateConfig().ptr);
 
-					System.out.println(b.getStateConfig().toString());
-					System.out.println("MOVE: X = " + move.x + " || Y = " + move.y);
+					// problem when my next move is only possible by the player before me enabling()
+					// a move
+					// ich bin dran
+					if (move == null) {
+						//System.out.println("Allmoves:" + b.calcFreeMoves(myNumber, b).toString());
+						Move lastmove = null;
+						if (myNumber == 0) {
+							lastmove = tree.randomMove(myNumber, b);
+						} else {
+							lastmove = tree.randomMove(myNumber, b);
+						}
+						if (lastmove == null || lastmove.y == -1)
+							throw new Exception("Game over:" + b.getScores());
+						client.sendMove(lastmove);
+					} else {
+						if (move.y == -1)
+							throw new Exception("Game over:" + b.getScores());
+						// baue Zug in meine spielfeldreprï¿½sentation ein
+						b.makeMove(move);
+						//System.out.println("Anzahl steine: " + b.getStateConfig().ptr);
+						//System.out.println(b.getStateConfig().toString());
+						//System.out.println("MOVE: X = " + move.x + " || Y = " + move.y);
+					}
 				}
+				// TODO recognize valid game end.
+			} catch (RuntimeException e) {
+				System.err.println(e.getLocalizedMessage());
+				e.printStackTrace();
+				System.err.println("Player" + myNumber + " Runtime Excep: GameOver Scores:" + b.getScores());
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.err.println("Player" + myNumber + " Exception: \n" + e.getLocalizedMessage());
 			}
-			//TODO recognize valid game end.
-			//save();
-		}catch (RuntimeException e) {
-			e.printStackTrace();			
-			System.err.println("Maybe GameOver Scores:"+b.getScores());
-		} catch (Exception e) {
-			save();
-			e.printStackTrace();
-			System.err.println("Exception: \n" + e.getLocalizedMessage());
 		}
-	}
-
 	
+	
+	public void stop(){
+        exit = true;
+        dead = true;
+    }
 
-	private static void load() {
-		Scanner scanner=null;
-		try {
-			
-			scanner = new Scanner(new File("weights.csv"));
-	        scanner.useDelimiter(";");
-	        while(scanner.hasNext()){
-	            weight_x = Integer.valueOf(scanner.next());
-	            weight_y = Integer.valueOf(scanner.next());
-	            weight_z = Integer.valueOf(scanner.next());
-	        }
-	        scanner.close();
-		} catch (FileNotFoundException e1) {
-			// do nothing use standards
-		}		
-	}
-
-	public static void save() {
-		try {
-			PrintWriter pw = new PrintWriter(new File("weights.csv"));
-	        StringBuilder sb = new StringBuilder();
-	        sb.append(weight_x);
-	        sb.append(';');
-	        sb.append(weight_y);
-	        sb.append(';');
-	        sb.append(weight_z);
-	        sb.append(';');
-	        sb.append('\n');
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			throw new AssertionError();
-		}
-	}
 }
