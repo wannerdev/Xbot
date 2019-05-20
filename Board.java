@@ -2,12 +2,13 @@ package Xbot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import lenz.htw.sawhian.Move;
 
 public class Board {
 	private Config stateConfig;
-
+	private Map<Float,Config> confs;
 	public Board() {
 		stateConfig = new Config();
 	}
@@ -81,8 +82,7 @@ public class Board {
 	 */
 	public static boolean isValidMove(Move m, Board board) throws Exception {
 		if (m == null) {
-			// System.err.println("NO Move");
-			throw new Exception("NO Move");
+			throw new Exception("NO Move\n"+board.stateConfig);
 			// return;
 		}
 		if ((m.x >= 0 && m.y >= 0 && m.x < 7 && m.y < 7) == false)
@@ -145,8 +145,7 @@ public class Board {
 	public boolean moveStone(Move move) throws Exception {
 		// bestimme den RichtungsVektor f�r den aktuellen Zug
 		if (move == null) {
-			// System.err.println("NO Move");
-			throw new Exception("NO Move");
+			throw new Exception("NO Move\n"+this.stateConfig);
 			// return;
 		}
 		Vector2 moveDir = new Vector2(0, 0);
@@ -218,7 +217,7 @@ public class Board {
 		boolean result=false;
 		if (move == null) {
 			// System.err.println("NO Move");
-			throw new Exception("NO Move"+this.stateConfig);
+			throw new Exception("NO Move\n"+this.stateConfig);
 			// return;
 		}
 		Stone stone = null;
@@ -247,14 +246,14 @@ public class Board {
 			}
 
 		} else {
-			// if the move isnt in the first row then just make the move
+			// if the move isn't in the first row then just make the move
 			result = moveStone(move);
 		}
 		return result;
 	}
 
 	private Stone getStoneFromStack(int player) {
-		for (int i = player * 7; i < (player + 1) * 7; i++) {
+		for (int i = player * 7; i < ((player + 1) * 7); i++) {
 			if (stateConfig.stones[i].inStack)
 				return stateConfig.stones[i];
 		}
@@ -265,7 +264,7 @@ public class Board {
 
 	int getScore(int player) {
 		int score = 0;
-		for (int i = player * 7; i < (player + 1) * 7; i++) {
+		for (int i = player * 7; i < ((player + 1) * 7); i++) {
 			if (stateConfig.stones[i].isScored)
 				score++;
 		}
@@ -274,7 +273,7 @@ public class Board {
 
 	boolean isAllBlocked(int player, Board board) {
 		int blocked = 0;
-		for (int i = player * 7; i < (player + 1) * 7; i++) {
+		for (int i = player * 7; i < ((player + 1) * 7); i++) {
 			if (stateConfig.stones[i].isBlocked(board))
 				blocked++;
 		}

@@ -141,6 +141,7 @@ public class MinMax {
 	
 	// x = jumpWeight
 	float rate(int player) {
+		
 		int freeStones = 0;
 		float jumps = 0;
 		Config conf = board.getStateConfig();
@@ -194,7 +195,8 @@ public class MinMax {
 			}
 			System.err.println("recheck rate function");
 			return -1; // probably also a Draw
-		}	
+		}
+		//TODO add hash mpa where ratings are saved for confsboard.confs
 	    return ((jumps * weightJump) + (bo.getScore(player) * weightScore));
 	}
 	

@@ -1,5 +1,7 @@
 package Xbot;
 
+import java.util.concurrent.TimeUnit;
+
 import lenz.htw.sawhian.Server;
 
 public class Tserver implements Runnable{
@@ -15,6 +17,12 @@ public class Tserver implements Runnable{
 			//TestRun.winner = winner;
 			Select.lock =false;
 			System.out.println("\nTserver Winner:"+winner);
+			try {
+				TimeUnit.SECONDS.sleep(1);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				throw new AssertionError();
+			}// to make sure they get the winner
 			exit = true;
 		}
 	}
