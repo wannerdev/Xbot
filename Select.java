@@ -14,23 +14,18 @@ import java.util.Set;
 import lenz.htw.sawhian.Server;
 
 public class Select {
-	//static float weight_x = 0.5f, weight_y = 0.25f, weight_z = 0.25f; +quality //arbitrary default values
-	static Float[] weights= {0.5f,0.25f,0.25f, 0f};
+	static Float[] weights= {0.5f,0.25f,0.25f, Float.MIN_VALUE};
 	static boolean lock = true;
-	//Not WORKING ATM
 	
 	public static void main(String[] args) {			
     	load();		//from filesystem
 		
-		//set base quality
-		int quali[]= {0,0,0,0,0,0,0,0,0,0,0,0};
 		//Candidates
 		Set<Float[]> candidates = new HashSet<Float[]>();
 		Set<Float[]> adaptedCands = new HashSet<Float[]>();
 		adaptedCands.add(Select.weights);
     	candidates = firstfill(candidates);
 		
-
 		
         while(true) {
 
@@ -47,17 +42,20 @@ public class Select {
     		//evaluation
     		int counter = 0;
     		String again = "y";
+    		
+    		try {						
         	while( it.hasNext() && adaptedCands.size() != 0 && again!="n"){
         			Tserver srv= new Tserver();
 	        		tsrv = new Thread (srv,"Server");
 	        		tsrv.start();
 	        		
 	        		Float[] cand1 = it.next();
-	        		if(it.hasNext() == false)break;
+	        		if(it.hasNext() == false)throw new Exception("no more cands");
+						
 	        		Float[] cand2 = it.next();
-	        		if(it.hasNext() == false)break;
+	        		if(it.hasNext() == false)throw new Exception("no more cands");
 	        		Float[] cand3 = it.next();
-	        		if(it.hasNext() == false)break;
+	        		if(it.hasNext() == false)throw new Exception("no more cands");
 	        		Float[] cand4 = it.next();
 	        		
 	        		client[] gc = new client[4];
@@ -66,29 +64,28 @@ public class Select {
 	        		gc[2] = new client(cand3[0],cand3[1],cand3[2]);
 	        		gc[3] = new client(cand4[0],cand4[1],cand4[2]);
 	                
-	        		Thread[] clientThread = new Thread[4];
-	        		clientThread[0] = new Thread(gc[0]);
-	        		clientThread[1] = new Thread(gc[1]);
-	        		clientThread[2] = new Thread(gc[2]);
-	        		clientThread[3] = new Thread(gc[3]);
+	        		Thread[] clientThread = new Thread[12];
 	        		
-	        		clientThread[0].start();
-	        		clientThread[1].start();
-	        		clientThread[2].start();
-	        		clientThread[3].start();
+	        		for(int i=0; i< 4*counter+1;i++) {
+	        			clientThread[i] = new Thread(gc[i]);
+	        			clientThread[i].start();
+	        		}
 
-	        		
-	        		while (lock) {
-						
+	        		while (lock) {						
 	                    for(int i = 0; i < 4 ; i++) {
-	                    	clientThread[i].isAlive();            	
+	                    	clientThread[i].isAlive();//Magic      	
 	                    }
 					};
-					int sel = 0;
-					System.out.println("getting winner");
-	        		//TODO who won
-					sel = (srv.getWinner()<0)?  srv.getWinner(): srv.getWinner()-1;
+					int win = srv.getWinner();
+					int sel =-1;
+					if(sel < 0) {
+						sel = srv.getWinner();
+					}else {
+						sel= srv.getWinner()-1;//player starts at 1
+					}
+					System.out.println("Getting winner"+win);
 					srv.stop();
+					srv=null;
 					if(sel >0) {//valid significant game
 						System.out.println("getting winner:"+sel);
 						long past = System.currentTimeMillis();
@@ -97,18 +94,14 @@ public class Select {
 		        		if(!adaptedCands.add(winner)) {
 		        			//if already in set increase quality
 		        			winner[3]++;
+		        			//System.out.println("We have a title");
 		        			//quali[(sel+1)*(counter+1)]=quali[sel*(counter+1)]+1;
-		        		}
-		        		//System.out.println(); return value of server?	        		
+		        		}      		
 		        		
 					}
 					counter++;
 	        		lock = true;
-	        		/*Stop threads
-	        		gc[0].stop();
-	        		gc[1].stop();
-	        		gc[2].stop();
-	        		gc[3].stop();*/
+	        		/*Stop threads*/
 	        		
 	        		//all candidates played at least once
 	        		if(counter == 3) {
@@ -123,7 +116,7 @@ public class Select {
 	        				candi[0] = (float) ((float) candi[0]+((0.2)*Math.random()-0.2*Math.random()));
 	        				candi[1]= (float) ((float) candi[1]+((0.2)*Math.random()-0.2*Math.random()));
 	        				candi[2]= (float) ((float) candi[2]+((0.2)*Math.random()-0.2*Math.random()));
-	        				candi[3]= 1f; //qualit√§t 1 da mutated winner
+	        				candi[3]= 0f; //qualit‰t 0 aber mutated winner
 	        				
 	        				candidates.add(candi); //refill candidates with mutated winners  
 	        			}
@@ -146,11 +139,15 @@ public class Select {
 						}*/
 	        		}
 	        	}
+    		} catch (Exception e) {
+				// TODO Auto-generated catch block
+				throw new AssertionError();
+			}
         	}
         }
 	
 	private static void getBest(Set<Float[]> adaptedCands) {
-		Float[] cache= {0f,0f,0f,0f};
+		Float[] cache= Select.weights;
 		for(Float[] win : adaptedCands) {
 			if(win[3]> cache[3]) {
 				cache= win;

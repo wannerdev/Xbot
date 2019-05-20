@@ -332,7 +332,7 @@ public class Board {
 	}
 	
 	public String getScores(){
-		return "P0:"+this.getScore(0)+" P1:"+this.getScore(1)+" P2:"+this.getScore(2)+" P3:"+this.getScore(3);
+		return "P0: "+this.getScore(0)+" P1: "+this.getScore(1)+" P2: "+this.getScore(2)+" P3: "+this.getScore(3);
 	}
 
 	/**

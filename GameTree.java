@@ -22,7 +22,13 @@ public class GameTree {
 		return m;
 	}
 	
-	
+	/**
+	 * 
+	 * @param playerNumber
+	 * @param b
+	 * @returns null if none possible
+	 * @throws Exception
+	 */
 	public Move randomMove(int playerNumber, Board b) throws Exception {
 
 		List<Move> myPossibleMoves = b.calcFreeMoves(playerNumber, b);
@@ -34,9 +40,9 @@ public class GameTree {
 			return myPossibleMoves.get(moveIndex);
 
 		} else {
-			throw new Exception("myPossibleMoves.size() <0 Game Over - All stones Blocked (If moves possible check calcfreemoves)");
-			//System.err.println
-			//return null;
+			//throw new Exception("myPossibleMoves.size() <0 Game Over - All stones Blocked (If moves possible check calcfreemoves)");
+			System.err.println("Game Over");
+			return null;
 		}
 	}
 }

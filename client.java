@@ -42,38 +42,35 @@ public class client implements Runnable {
 			if (dead) {
 				return;
 			}
-			Board b = new Board();
 			int myNumber = -1;
+			Board b = new Board();
 			try {
 				String logoh = "cybran";
 				BufferedImage logo = ImageIO.read(new File("src/Xbot/" + logoh + ".png"));
 				Integer num = (int) (Math.random() * 50);
 				NetworkClient client = new NetworkClient(null, "XBot" + num.toString() + "000", logo);
 				myNumber = client.getMyPlayerNumber();
-				System.out.println("Player:" + myNumber);
+				System.out.println("Player" + myNumber);
 
 				GameTree tree = new GameTree();
-				int x = 0, y = 0;
 				while (true) {
 					Move move = client.receiveMove(); // Man bekommt auch den eigenen Zug
 
-					// problem when my next move is only possible by the player before me enabling()
-					// a move
 					// ich bin dran
 					if (move == null) {
-						//System.out.println("Allmoves:" + b.calcFreeMoves(myNumber, b).toString());
+						System.out.println("Allmoves:" + b.calcFreeMoves(myNumber, b).toString());
 						Move lastmove = null;
 						if (myNumber == 0) {
 							lastmove = tree.randomMove(myNumber, b);
 						} else {
 							lastmove = tree.randomMove(myNumber, b);
 						}
-						if (lastmove == null || lastmove.y == -1)
-							throw new Exception("Game over:" + b.getScores());
+						if (lastmove == null || lastmove.y == -1) {
+							System.err.println("player"+myNumber+" Game over :" + b.getScores());
+							lastmove = new Move(-1,-1,-1); //So server doesn't have to wait.
+						}
 						client.sendMove(lastmove);
 					} else {
-						if (move.y == -1)
-							throw new Exception("Game over:" + b.getScores());
 						// baue Zug in meine spielfeldrepr�sentation ein
 						b.makeMove(move);
 						//System.out.println("Anzahl steine: " + b.getStateConfig().ptr);
