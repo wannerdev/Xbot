@@ -17,6 +17,7 @@ public class client implements Runnable {
 	float[] weights={0.5f,0.25f,0.25f, Float.MIN_VALUE};;
 	private volatile boolean exit = false;
 	public boolean dead = false;
+	String howtoplay="MaxN"; 
 	// Laptop Auflï¿½sung server
 	// java -Djava.library.path=C:\Users\Johannes\Dropbox\Java\sawhian\lib\native
 	// -jar C:\Users\Johannes\Dropbox\Java\sawhian\sawhian.jar 4 1600 900
@@ -25,24 +26,41 @@ public class client implements Runnable {
 	// -Djava.library.path=D:\Wichtig\Programmieren\Java\Xbot\sawhian\lib\native
 	// -jar D:\Wichtig\Programmieren\Java\Xbot\sawhian\sawhian.jar 4 1600 900
 
-	public client(Float[] weights ) {
+	public client(Float[] weights) {
 		this.weights[0] = weights[0];
 		this.weights[1] = weights[1];
 		this.weights[2] = weights[2];
 		this.weights[3] = weights[3];
+		howtoplay= "MaxN";
 	}
 
-	//TODO Check loading weights
+	/**
+	 * 
+	 * @param howtoplay takes either MaxN, random or firstMove, atm
+	 */
+	public client(String howtoplay) {
+		this.howtoplay = this.howtoplay;
+	}
+	
+	/**
+	 * plays with MaxN
+	 */
 	public client() {
-		
+		this.howtoplay = "MaxN";
+		SelectFillerAndIO fill = new SelectFillerAndIO();
+		weights=fill.load();
+		System.out.println("Playing with:");
+		System.out.println("0:"+weights[0]+" 1:"+weights[1]+" 2:"+weights[2]+" 3"+weights[3]);
 	}
 
+	
 	@Override
 	public void run() {
         
 		if (dead) {
 			return;
 		}
+		long timeElapsed=0;
 		Board b = new Board();
 
 		try {
@@ -62,12 +80,21 @@ public class client implements Runnable {
 				// enabling(unblocking) a move
 				// ich bin dran
 				if (move == null) {
+					long startTime = System.currentTimeMillis();
 					//System.out.println("Allmoves:" + b.calcFreeMoves(myNumber, b).toString());
-					Move lastmove = tree.MultiMax(myNumber, b,weights);
-					if (myNumber == 0) {
+					Move lastmove = null;
+					if(howtoplay.equals("MaxN")) {
 						lastmove = tree.MultiMax(myNumber, b,weights);
-
+						if (myNumber == 0) {
+							lastmove = tree.MultiMax(myNumber, b,weights);
+						}
+					}else if(howtoplay.equals("random")){
+						lastmove = tree.randomMove(myNumber, b);
+					}else if(howtoplay.equals("firstMove")){
+						lastmove = tree.calculateOneMove(myNumber, b);						
 					}
+					long endTime = System.currentTimeMillis();
+					timeElapsed = endTime - startTime;
 					client.sendMove(lastmove);
 					// x++;
 				} else {
@@ -83,6 +110,7 @@ public class client implements Runnable {
 			// save();
 		} catch (RuntimeException e) {
 			e.printStackTrace();
+			System.err.println("Zulange gebraucht?:"+timeElapsed);
 			System.err.println("Maybe GameOver Scores:" + b.getScores());
 		} catch (Exception e) {
 

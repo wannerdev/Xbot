@@ -37,16 +37,16 @@ public class Board {
 
 			for (int i = 0; i < 7; i++) {
 
-				Move relMove = new Move(player, i, 0); //unrotated
+				Move relMove = new Move(player, i, 0); // unrotated
 				Move absMove = new Move(player, i, 0);
 				if (player != 0) {
 					Move cache = KoordHelper.rotate(player, relMove);
 					int x = cache.x;
 					int y = cache.y;
-					int pl= cache.player;
-					absMove = new Move(pl, x, y); //rotated
+					int pl = cache.player;
+					absMove = new Move(pl, x, y); // rotated
 				}
-				//If not player 0 absMove is relativemove
+				// If not player 0 absMove is relativemove
 				if (spotIsFree(absMove.x, absMove.y, board.stateConfig)) {
 					if (isValidMove(absMove, board)) {
 						result.add(absMove);
@@ -72,7 +72,7 @@ public class Board {
 	}
 
 	/**
-	 * Unfinished TODO Test if correct
+	 * 
 	 * 
 	 * @param m
 	 * @param board
@@ -80,10 +80,10 @@ public class Board {
 	 * @returns true if possible
 	 */
 	public static boolean isValidMove(Move m, Board board) throws Exception {
-		if(m == null) {
-			//System.err.println("NO Move");
+		if (m == null) {
+			// System.err.println("NO Move");
 			throw new Exception("NO Move");
-			//return;
+			// return;
 		}
 		if ((m.x >= 0 && m.y >= 0 && m.x < 7 && m.y < 7) == false)
 			return false;// throw new Exception("isValidMove() Borders");
@@ -142,16 +142,20 @@ public class Board {
 	 * am Spielbrettrand mit einem nicht-eigenen Stein endet. -- wir gehen davon aus
 	 * das man immer die maximale Anzahl springt // Mail von Lenz als Best�tigung
 	 */
-	public void moveStone(Move move) throws Exception {
+	public boolean moveStone(Move move) throws Exception {
 		// bestimme den RichtungsVektor f�r den aktuellen Zug
-		if(move == null) {
-			//System.err.println("NO Move");
+		if (move == null) {
+			// System.err.println("NO Move");
 			throw new Exception("NO Move");
-			//return;
+			// return;
 		}
 		Vector2 moveDir = new Vector2(0, 0);
 		int howManyFields = 1;
-		Stone movingStone  = this.getStoneAtKoord(move.x, move.y);
+		Stone movingStone = this.getStoneAtKoord(move.x, move.y);
+		if (movingStone == null) {
+			// System.err.println("GameOver"+this.getScores());
+			return false;
+		}
 		int jmp = movingStone.canJump(this);
 		if (jmp > 0) {
 			howManyFields = jmp * 2; // if we can jump we have to jump.
@@ -198,6 +202,7 @@ public class Board {
 			}
 
 		}
+		return true;
 	}
 
 	/**
@@ -206,25 +211,23 @@ public class Board {
 	 * 
 	 * @param move
 	 * @param board
-	 * @throws Exception
-	 *             if player is out of range
+	 * @throws Exception if Move null
+	 *             
 	 */
-	public void makeMove(Move move) throws Exception {
-
-		if(move == null) {
-			//System.err.println("NO Move");
-			throw new Exception("NO Move");
-			//return;
+	public boolean makeMove(Move move) throws Exception {
+		boolean result=false;
+		if (move == null) {
+			// System.err.println("NO Move");
+			throw new Exception("NO Move"+this.stateConfig);
+			// return;
 		}
 		Stone stone = null;
 
 		if (isMoveInStartingRow(move)) {
-
 			if (getStoneAtKoord(move.x, move.y) == null) {
-
 				// if it isn't then take a stone from the stack and place it
 				stone = getStoneFromStack(move.player);
-				if(stone ==null) {
+				if (stone == null) {
 					throw new Exception("Probably something with the board representation, no stone in stack");
 				}
 				// if we have a stone in stack
@@ -238,16 +241,16 @@ public class Board {
 				stone.y = (byte) y;
 				byte player = (byte) move.player;
 				stone.player = player;
-
+				result=true;
 			} else {
-
-				moveStone(move);
+				result = moveStone(move);
 			}
 
 		} else {
 			// if the move isnt in the first row then just make the move
-			moveStone(move);
+			result = moveStone(move);
 		}
+		return result;
 	}
 
 	private Stone getStoneFromStack(int player) {
@@ -255,7 +258,8 @@ public class Board {
 			if (stateConfig.stones[i].inStack)
 				return stateConfig.stones[i];
 		}
-		//System.err.println("getStoneFromStack player"+player+"\n config:\n "+stateConfig.toString());
+		// System.err.println("getStoneFromStack player"+player+"\n config:\n
+		// "+stateConfig.toString());
 		return null;
 	}
 
@@ -267,15 +271,14 @@ public class Board {
 		}
 		return score;
 	}
-	
-	
+
 	boolean isAllBlocked(int player, Board board) {
 		int blocked = 0;
 		for (int i = player * 7; i < (player + 1) * 7; i++) {
 			if (stateConfig.stones[i].isBlocked(board))
 				blocked++;
 		}
-	
+
 		return (blocked == 7);
 	}
 
@@ -332,16 +335,17 @@ public class Board {
 		if ((x >= 0 && y >= 0 && x < 7 && y < 7) == false)
 			return null;
 		// search for stone
-		for (int i = 0; i < stateConfig.stones.length; i++) { 
+		for (int i = 0; i < stateConfig.stones.length; i++) {
 			if (stateConfig.stones[i].x == x && stateConfig.stones[i].y == y) {
 				return stateConfig.stones[i];
 			}
 		}
 		return null;
 	}
-	
-	public String getScores(){
-		return "P0: "+this.getScore(0)+" P1: "+this.getScore(1)+" P2: "+this.getScore(2)+" P3: "+this.getScore(3);
+
+	public String getScores() {
+		return "P0: " + this.getScore(0) + " P1: " + this.getScore(1) + " P2: " + this.getScore(2) + " P3: "
+				+ this.getScore(3);
 	}
 
 	/**
