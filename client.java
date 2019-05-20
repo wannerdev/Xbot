@@ -13,9 +13,8 @@ import lenz.htw.sawhian.Move;
 import lenz.htw.sawhian.net.*;
 
 public class client implements Runnable {
-
-	float weight_x , weight_y , weight_z; // arbitrary default values
-	float[] weights;
+	
+	float[] weights={0.5f,0.25f,0.25f, Float.MIN_VALUE};;
 	private volatile boolean exit = false;
 	public boolean dead = false;
 	// Laptop Auflï¿½sung server
@@ -26,17 +25,16 @@ public class client implements Runnable {
 	// -Djava.library.path=D:\Wichtig\Programmieren\Java\Xbot\sawhian\lib\native
 	// -jar D:\Wichtig\Programmieren\Java\Xbot\sawhian\sawhian.jar 4 1600 900
 
-	public client(Float weight_x, Float weight_y, Float weight_z) {
-		weights = new float[3];
-		weights[0] = weight_x;
-		weights[1] = weight_y;
-		weights[2] = weight_z;
+	public client(Float[] weights ) {
+		this.weights[0] = weights[0];
+		this.weights[1] = weights[1];
+		this.weights[2] = weights[2];
+		this.weights[3] = weights[3];
 	}
 
 	//TODO Check loading weights
-
 	public client() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	@Override

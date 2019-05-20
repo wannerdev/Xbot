@@ -26,7 +26,7 @@ public class MinMax {
 	}
 
 	public Move run(int player) throws Exception {
-		int[] rating = new int[4];
+		float[] rating = new float[4];
 
 		// Multiply by 3 because we are 4 players
 		rating = Shallow(board.getStateConfig(), player, maxsum, targetDepth * 3); // maxN(player, targetDepth * 3);
@@ -45,8 +45,15 @@ public class MinMax {
 
 	}
 
-	public int[] maxN(int player, int depth) throws Exception {
-		int ratings[] = new int[4];
+	/**
+	 * deprecated
+	 * @param player
+	 * @param depth
+	 * @return
+	 * @throws Exception
+	 */
+	public float[] maxN(int player, int depth) throws Exception {
+		float ratings[] = new float[4];
 		// get all free moves
 		List<Move> posMoves = board.calcFreeMoves(player, board);
 		// if I am the final node, evaluate my Configuration and return the rating
@@ -56,7 +63,7 @@ public class MinMax {
 		}
 		Config cache;
 		// make a List/ array for all the ratings of the possible nodes
-		ArrayList<int[]> ratingList = new ArrayList<int[]>();
+		ArrayList<float[]> ratingList = new ArrayList<float[]>();
 		int j = 0;
 
 		// iterate through all possible moves
@@ -89,14 +96,14 @@ public class MinMax {
 			board.setStateConfig(cache); // macheZugRueckgaengig();
 			j++;
 		}
-		int[] bestRating = getBestRating(player, ratingList);
+		float[] bestRating = getBestRating(player, ratingList);
 
 		return bestRating;
 	}
 
-	private int getOurBestMove(int player, ArrayList<int[]> list) {
-		int cache = 0;
-		for (int[] item : list) {
+	private float getOurBestMove(int player, ArrayList<Float[]> list) {
+		float cache = 0;
+		for (Float[] item : list) {
 			if (item[player] >= cache) {
 				cache = item[player];
 			}
@@ -104,9 +111,9 @@ public class MinMax {
 		return cache;
 	}
 
-	private static int[] getBestRating(int player, ArrayList<int[]> list) {
-		int[] cache = new int[4];
-		for (int[] item : list) {
+	private static float[] getBestRating(int player, ArrayList<float[]> list) {
+		float[] cache = new float[4];
+		for (float[] item : list) {
 			if (item[player] >= cache[player]) {
 				cache = item;
 			}
@@ -123,23 +130,19 @@ public class MinMax {
 		return player;
 	}
 
-	int[] rateAll() {
-		int ratings[] = new int[4];
+	float[] rateAll() {
+		float ratings[] = new float[4];
 		ratings[0] = rate(0);
 		ratings[1] = rate(1);
 		ratings[2] = rate(2);
 		ratings[3] = rate(3);
-
 		return ratings;
 	}
 	
 	// x = jumpWeight
-	// y = scoreWeight
-	// z = hasJumpedWeight
-    // f(x) = ((canJump+ (hasJumped*z)) * x) + (bo.getScore(player) * y);
-	int rate(int player) {
+	float rate(int player) {
 		int freeStones = 0;
-		int jumps = 0;
+		float jumps = 0;
 		Config conf = board.getStateConfig();
 		Board bo = board;
 		float weightJump = 2*weights[0];
@@ -189,17 +192,14 @@ public class MinMax {
 				// TODO check
 				return -1; // Draw
 			}
-		}
-
-	
-	        // TODO int to float
-			return (int)((jumps * weightJump) + (bo.getScore(player) * weightScore));
-
-		
-
+			System.err.println("recheck rate function");
+			return -1; // probably also a Draw
+		}	
+	    return ((jumps * weightJump) + (bo.getScore(player) * weightScore));
 	}
+	
 
-	int[] Shallow(Config Node, int Player, int Bound, int depth) throws Exception {
+	float[] Shallow(Config Node, int Player, float Bound, int depth) throws Exception {
 		// add something here so that we can check if a player has a score = 7
 		if (Bound < 0) {
 
@@ -221,21 +221,20 @@ public class MinMax {
 		board.makeMove(firstMove);
 		// populate the ratings table by evaluating the first leaf node
 
-		int Best[] = Shallow(board.getStateConfig(), nextPlayer(Player), maxsum, depth - 1);
+		float Best[] = Shallow(board.getStateConfig(), nextPlayer(Player), maxsum, depth - 1);
 
 		// reset the board so that it can be used again
 		board.setStateConfig(cache);
 		int i = 0;
 
 		// now for the remaining child nodes board.setStateConfig(cache);
-		int Current[];
+		float Current[];
 		for (Move move : posMoves) {
 			if (i != 0) {
 
 				if (Best[Player] >= Bound) {
 					if (move.player == Player && depth == targetDepth * 3) {
 						savedMove[Player] = move;
-
 					}
 					prune++;
 					return Best;
@@ -290,11 +289,8 @@ public class MinMax {
 					//System.out.println("this is fucked3");
 				}
 			}
-
 		}
-
 		return Best;
-
 	}
 
 }

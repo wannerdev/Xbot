@@ -14,11 +14,12 @@ import java.util.Set;
 import lenz.htw.sawhian.Server;
 
 public class Select {
-	//static float weight_x = 0.5f, weight_y = 0.25f, weight_z = 0.25f; +quality //arbitrary default values
-	static Float[] weights= {0.5f,0.25f,0.25f, 0f};
+	// static float weight_x = 0.5f, weight_y = 0.25f, weight_z = 0.25f; +quality
+	// //arbitrary default values
+	static Float[] weights = { 0.5f, 0.25f, 0.25f, 0f };
 	static boolean lock = true;
-	//Not WORKING ATM
-	
+	// Not WORKING ATM
+
 	public static void main(String[] args) {			
     	load();		//from filesystem
 		
@@ -31,7 +32,7 @@ public class Select {
     	candidates = firstfill(candidates);
     	int counter = 0;
 
-		
+		try {						
         while(true) {
 
     		Iterator<Float[]> it = candidates.iterator();
@@ -52,62 +53,54 @@ public class Select {
 	        		tsrv.start();
 	        		
 	        		Float[] cand1 = it.next();
-	        		if(it.hasNext() == false)break;
+	        		if(it.hasNext() == false)throw new Exception("no more cands");					
 	        		Float[] cand2 = it.next();
-	        		if(it.hasNext() == false)break;
+	        		if(it.hasNext() == false)throw new Exception("no more cands");
 	        		Float[] cand3 = it.next();
-	        		if(it.hasNext() == false)break;
+	        		if(it.hasNext() == false)throw new Exception("no more cands");
 	        		Float[] cand4 = it.next();
 	        		
 	        		client[] gc = new client[4];
-	        		gc[0] = new client(cand1[0],cand1[1],cand1[2]);
-	        		gc[1] = new client(cand2[0],cand2[1],cand2[2]);
-	        		gc[2] = new client(cand3[0],cand3[1],cand3[2]);
-	        		gc[3] = new client(cand4[0],cand4[1],cand4[2]);
+	        		gc[0] = new client(cand1);
+	        		gc[1] = new client(cand2);
+	        		gc[2] = new client(cand3);
+	        		gc[3] = new client(cand4);
 	                
-	        		Thread[] clientThread = new Thread[4];
-	        		clientThread[0] = new Thread(gc[0]);
-	        		clientThread[1] = new Thread(gc[1]);
-	        		clientThread[2] = new Thread(gc[2]);
-	        		clientThread[3] = new Thread(gc[3]);
+	        		Thread[] clientThread = new Thread[12];
 	        		
-	        		clientThread[0].start();
-	        		clientThread[1].start();
-	        		clientThread[2].start();
-	        		clientThread[3].start();
-
-	        		
-	        		while (lock) {
-						
+	        		for(int i=0; i< 4*counter+1;i++) {
+	        			clientThread[i] = new Thread(gc[i]);
+	        			clientThread[i].start();
+						long past = System.currentTimeMillis();
+		        		while(System.currentTimeMillis() > past +400);//to make sure they connect in correct order
+	        		}
+	        		while (lock) {						
 	                    for(int i = 0; i < 4 ; i++) {
-	                    	clientThread[i].isAlive();            	
+	                    	clientThread[i].isAlive(); //Magic           	
 	                    }
 					};
-					int sel = 0;
-					System.out.println("getting winner");
-	        		//TODO who won
-					sel = (srv.getWinner()<0)?  srv.getWinner(): srv.getWinner()-1;
+					int win = srv.getWinner();
+					int sel =-1;
+					if(win >= 0) {
+						sel= srv.getWinner()-1;//player starts at 1
+					}
+					System.out.println("Getting winner player:"+win);
 					srv.stop();
+					srv=null;
 					if(sel >=0) {//valid significant game
 						System.out.println("winner is :"+sel);
-						long past = System.currentTimeMillis();
-		        		while(System.currentTimeMillis() > past +2000);//warte 2sek
-						Float[] winner = new Float[] {gc[sel].weight_x, gc[sel].weight_y, gc[sel].weight_z,0f}; 
+						Float[] winner = new Float[] {gc[sel].weights[0], gc[sel].weights[1], gc[sel].weights[2], weights[3]}; 
 		        		if(!adaptedCands.add(winner)) {
 		        			//if already in set increase quality
 		        			winner[3]++;
 		        			//quali[(sel+1)*(counter+1)]=quali[sel*(counter+1)]+1;
 		        		}
-		        		//System.out.println(); return value of server?	        		
-		        		
+						long past = System.currentTimeMillis();
+		        		while(System.currentTimeMillis() > past +2000);//warte 2sek TODO test if needed
 					}
 					counter++;
 	        		lock = true;
-	        		/*Stop threads
-	        		gc[0].stop();
-	        		gc[1].stop();
-	        		gc[2].stop();
-	        		gc[3].stop();*/
+	        		/*Stop threads*/
 	        		
 	        		//all candidates played at least once
 	        		System.out.println("COUNTER :: "+counter);
@@ -166,87 +159,91 @@ public class Select {
 						}*/
 	        		}
 	        	}
+        
         	}
+        } catch (Exception e) {
+			// TODO Auto-generated catch block
+			throw new AssertionError();
+		}
         }
-	
+
 	private static void getBest(Set<Float[]> adaptedCands) {
-		Float[] cache= {0f,0f,0f,0f};
-		for(Float[] win : adaptedCands) {
-			if(win[3]> cache[3]) {
-				cache= win;
+		Float[] cache = { 0f, 0f, 0f, 0f };
+		for (Float[] win : adaptedCands) {
+			if (win[3] > cache[3]) {
+				cache = win;
 			}
 		}
-		Select.weights= cache;
+		Select.weights = cache;
 	}
 
+	/**
+	 * create 12 cands 0,1 -0,9 and some completely random
+	 * @param cands
+	 * @return
+	 */
 	private static Set<Float[]> firstfill(Set<Float[]> cands) {
-		for(int i=0; i < 12; i++) {
-			cands.add(new Float[] {(float) (0.01f+Math.random()),(float) ((float) 0.01f+(Math.random())),(float) ((float) 0.01f+Math.random()),0f});
+		for (int i = 1; i < 10; i++) {
+			cands.add(new Float[] { i/10f,i/10f,i/10f, 0f });
 		}
+		cands.add(new Float[] { (float) (Math.random()), (float) ((float) (Math.random())),
+				(float) ((float)  Math.random()), 0f });
+		cands.add(new Float[] { (float) (Math.random()), (float) ((float) (Math.random())),
+				(float) ((float)  Math.random()), 0f });
+		cands.add(new Float[] { (float) (Math.random()), (float) ((float) (Math.random())),
+				(float) ((float)  Math.random()), 0f });
 		return cands;
 	}
-	
+
 	private static Set<Float[]> refill(Set<Float[]> winners) {
-		//winners should be max 4
-		for(int i=0; i < 12-winners.size(); i++) {
-			winners.add(new Float[] {(float) (0.01f+Math.random()),(float) (0.01f+Math.random()),(float) (0.01f+Math.random()),0f});
+		// winners should be max 4
+		for (int i = 0; i < 12 - winners.size(); i++) {
+			winners.add(new Float[] { (float) (Math.random()), (float) ((float) (Math.random())),
+					(float) ((float)  Math.random()), 0f });
 		}
 		return winners;
 	}
 
-	private static void load() {
-		Scanner scanner=null;
+	public static Float[] load() {
+		Scanner scanner = null;
 		try {
-			
+
 			scanner = new Scanner(new File("weights.csv"));
-	        scanner.useDelimiter(";");
-	        while(scanner.hasNext()){
-	        	weights[0] = Float.valueOf(scanner.next());
-	        	weights[1] = Float.valueOf(scanner.next());
-	        	weights[2] = Float.valueOf(scanner.next());
-	        	weights[3] = Float.valueOf(scanner.next());
-	        }
-	        scanner.close();
+			scanner.useDelimiter(";");
+			while (scanner.hasNext()) {
+				weights[0] = Float.valueOf(scanner.next());
+				weights[1] = Float.valueOf(scanner.next());
+				weights[2] = Float.valueOf(scanner.next());
+				weights[3] = Float.valueOf(scanner.next());
+			}
+			scanner.close();
+			return weights;
 		} catch (FileNotFoundException e1) {
 			System.out.println("using default values");
 			// do nothing use standards
-		}		
+			return null;
+		}
 	}
 
 	public static void save() {
 		try {
 			System.out.println("saving to disk");
 			PrintWriter pw = new PrintWriter(new File("weights.csv"));
-	        StringBuilder sb = new StringBuilder();
-	        sb.append(weights[0]);
-	        sb.append(';');
-	        sb.append(weights[1]);
-	        sb.append(';');
-	        sb.append(weights[2]);
-	        sb.append(';');
-	        sb.append(weights[3]);
-	        sb.append(';');
-	        pw.write(sb.toString());
-	        pw.close();
-	        
+			StringBuilder sb = new StringBuilder();
+			sb.append(weights[0]);
+			sb.append(';');
+			sb.append(weights[1]);
+			sb.append(';');
+			sb.append(weights[2]);
+			sb.append(';');
+			sb.append(weights[3]);
+			sb.append(';');
+			pw.write(sb.toString());
+			pw.close();
+
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			throw new AssertionError();
 		}
 	}
-	
-	/**
-	 * //it = adaptedCands.iterator();
-	        			/*
-	        			int medianX=0, medianY=0, medianZ=0;
-	        			for(Float[] cand : adaptedCands) {
-	        				medianX += cand[0];
-	        				medianY += cand[1];
-	        				medianZ += cand[2];
-	        			}
-	        			Float amount = (float) adaptedCands.size();
-	        			final Float X = (medianX/amount);
-	        			final Float Y = medianY/amount;
-	        			final Float Z = medianZ/amount;
-	        			*/
 }
