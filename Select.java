@@ -95,7 +95,7 @@ public class Select {
 				srv.stop();
 				srv = null;
 				if (sel >= 0) {// valid significant game
-					Float[] winner = new Float[] { gc[sel].weights[0], gc[sel].weights[1], gc[sel].weights[2],
+					Float[] winner =  new Float[] { gc[sel].weights[0], gc[sel].weights[1], gc[sel].weights[2],
 							gc[sel].weights[3] + 1f };
 					// increase quality, should there be a winner shose quality shouldn't be
 					// increased?
@@ -125,9 +125,6 @@ public class Select {
 
 					// recombination
 					Iterator<Float[]> ada = adaptedCands.iterator();
-					Float[] best = fill.getBest(adaptedCands);
-					weights = best;
-					candidates.add(best); // Add Best rated Parent without changing
 
 					Set<Float[]> delete = new HashSet<Float[]>();
 					for (Float loser[] : candidates) {
@@ -143,7 +140,9 @@ public class Select {
 					while (ada.hasNext()) { // mutate //should be 4 3 winners one loaded(default or parent)
 						Float[] candi = ada.next();
 						Float[] mutated =new Float[4];
-						candidates.add(candi.clone()); // add the real winners (adapted+)
+						if(!candidates.contains(candi)) {
+							candidates.add(candi); // add the real winners (adapted+)
+						}
 						// Range ist um den wert herum maximal einfach +- 0.2
 						if (candi[3] >= 0.5f) {// If winner (all should be winners except default)
 							for (int j = 0; j < 3; j++) { // mutate the weights
@@ -156,18 +155,23 @@ public class Select {
 									mutated[j] = 1f;
 								}
 							}
-							mutated[3] = 0f; // qualität eigentlich 0 da nur mutated winner
+							mutated[3] = 0.1f; // qualität 0 da nur mutated winner, 0.1 just for id purposes
 							candidates.add(mutated); // add mutated winners to candidates
 						}
 					}
+					Float[] best = fill.getBest(adaptedCands);
+					adaptedCands.removeAll(adaptedCands); //clean winners for new ones.
+					weights = best;
+					adaptedCands.add(best); // Add Best rated Parent 
 					// candidates.add(adaptedCands);
 					candidates = fill.fillInUntilFull(candidates);
 					fill.save(weights);
 				}
 			}
 			// Response to not enough candidates in iterator
-			 System.out.println("No Cands?");
-			 candidates = fill.fillInUntilFull(candidates);
+			System.out.println("No Cands?");
+			candidates = fill.fillInUntilFull(candidates);
+			//it = candidates.iterator();
 		}
 	}
 

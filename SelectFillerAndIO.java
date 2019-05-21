@@ -28,13 +28,17 @@ public class SelectFillerAndIO {
 		}
 		return cands;
 	}
-
+/**
+ * Comparison based on it disregarding .-
+ * @param adaptedCands
+ * @return
+ */
 	public Float[] getBest(Set<Float[]> adaptedCands){
 		System.out.println(adaptedCands.size());
 		Float[] cache = { 0f, 0f, 0f, -1f };
 		Float[] cache2 = { 0f, 0f, 0f, -1f };
 		for (Float[] win : adaptedCands) {
-			if (win[3] >= cache2[3]) {
+			if (win[3].intValue() >= (cache2[3].intValue())) {
 				cache2 = win;
 			}
 		}
