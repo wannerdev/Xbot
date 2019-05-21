@@ -84,9 +84,8 @@ public class Select {
 					}
 					TimeUnit.SECONDS.sleep(2);
 					// System.out.println("locked");
-				}
-				;
-				TimeUnit.SECONDS.sleep(2);// warte 2sek
+				};
+				//TimeUnit.SECONDS.sleep(2);// warte 2sek
 				int win = srv.getWinner();
 				int sel = -1;
 				if (win >= 0) {
@@ -143,21 +142,22 @@ public class Select {
 					System.out.println("candis: " + candidates.size());
 					while (ada.hasNext()) { // mutate //should be 4 3 winners one loaded(default or parent)
 						Float[] candi = ada.next();
-						candidates.add(candi); // add the real winners
+						Float[] mutated =new Float[4];
+						candidates.add(candi.clone()); // add the real winners (adapted+)
 						// Range ist um den wert herum maximal einfach +- 0.2
 						if (candi[3] >= 0.5f) {// If winner (all should be winners except default)
 							for (int j = 0; j < 3; j++) { // mutate the weights
-								candi[j] = (float) ((float) candi[j] + ((0.02) * Math.random() - 0.01 * Math.random()));
+								mutated[j] = (float) ((float) candi[j] + ((0.02) * Math.random() - 0.01 * Math.random()));
 								// respect 1 as maximum and 0 as minimum
-								if (candi[j] < 0) {
-									candi[j] = 0f;
+								if (mutated[j] < 0) {
+									mutated[j] = 0f;
 								}
-								if (candi[j] > 1) {
-									candi[j] = 1f;
+								if (mutated[j] > 1) {
+									mutated[j] = 1f;
 								}
 							}
-							candi[3] = 0.01f; // qualität eigentlich 0 da nur mutated winner
-							candidates.add(candi); // add mutated winners to candidates
+							mutated[3] = 0f; // qualität eigentlich 0 da nur mutated winner
+							candidates.add(mutated); // add mutated winners to candidates
 						}
 					}
 					// candidates.add(adaptedCands);
