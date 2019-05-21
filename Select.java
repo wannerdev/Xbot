@@ -61,7 +61,13 @@ public class Select {
 				if (it.hasNext() == false)
 					break;
 				Float[] cand4 = it.next();
-
+				System.out.println("Candidated Playing:");
+				//for (int i=0; i<4;) {
+				System.out.println("# " + cand1[0] + " " + cand1[1] + " " + cand1[2] + " " + cand1[3]);
+				System.out.println("# " + cand2[0] + " " + cand2[1] + " " + cand2[2] + " " + cand2[3]);
+				System.out.println("# " + cand3[0] + " " + cand3[1] + " " + cand3[2] + " " + cand3[3]);
+				System.out.println("# " + cand4[0] + " " + cand4[1] + " " + cand4[2] + " " + cand4[3]);
+				//}
 				client[] gc = new client[4];
 				gc[0] = new client(cand1);
 				gc[1] = new client(cand2);
@@ -101,8 +107,21 @@ public class Select {
 					// increased?
 					System.out.println("Winner misfit:");
 					System.out.println("0:" + winner[0] + " 1:" + winner[1] + " 2:" + winner[2] + " 3:" + winner[3]);
-					adaptedCands.add(winner);
-					/*System.out.println("add result:"+);
+					//Float[] comp = {winner[0],winner[1], winner[2], winner[3]};
+					boolean contains =false;
+					for (Float[] cand : adaptedCands) {
+						if(!(
+						cand[0].floatValue()==winner[0].floatValue()&&
+						cand[1].floatValue()==winner[1].floatValue()&&
+						cand[2].floatValue()==winner[2].floatValue()&&
+						cand[3].floatValue()==winner[3].floatValue()
+						)){
+							contains = true;
+						}
+					}
+					if(!contains) {
+						adaptedCands.add(winner); // add the real winners (adapted+)
+					}/*System.out.println("add result:"+);
 					 * 
 					 * for (Float[] f : adaptedCands) { System.out.println("# " + f[0] + " " + f[1]
 					 * + " " + f[2] + " " + f[3]);
@@ -146,7 +165,7 @@ public class Select {
 						// Range ist um den wert herum maximal einfach +- 0.2
 						if (candi[3] >= 0.5f) {// If winner (all should be winners except default)
 							for (int j = 0; j < 3; j++) { // mutate the weights
-								mutated[j] = (float) ((float) candi[j] + ((0.02) * Math.random() - 0.01 * Math.random()));
+								mutated[j] = (float) ((float) candi[j] + ((0.01) * Math.random() - 0.01 * Math.random()));
 								// respect 1 as maximum and 0 as minimum
 								if (mutated[j] < 0) {
 									mutated[j] = 0f;
