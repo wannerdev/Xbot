@@ -110,7 +110,7 @@ public class Select {
 					//Float[] comp = {winner[0],winner[1], winner[2], winner[3]};
 					boolean contains =false;
 					for (Float[] cand : adaptedCands) {
-						if(!(
+						if((
 						cand[0].floatValue()==winner[0].floatValue()&&
 						cand[1].floatValue()==winner[1].floatValue()&&
 						cand[2].floatValue()==winner[2].floatValue()&&
