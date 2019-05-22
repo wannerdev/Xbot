@@ -3,6 +3,8 @@ package Xbot;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Scanner;
 import java.util.Set;
@@ -28,18 +30,13 @@ public class SelectFillerAndIO {
 		}
 		return cands;
 	}
-/**
- * Comparison based on it disregarding .-
- * @param adaptedCands
- * @return
- */
-	public Float[] getBest(Set<Float[]> adaptedCands){
-		System.out.println(adaptedCands.size());
+/*	
+	public Set<Float[]> getBest3(Set<Float[]> adaptedCands){
 		Float[] cache = { 0f, 0f, 0f, -1f };
-		Float[] cache2 = { 0f, 0f, 0f, -1f };
+		Set<Float[]> cache2 = new HashSet<Float[]>();
 		for (Float[] win : adaptedCands) {
 			if (win[3].intValue() >= (cache2[3].intValue())) {
-				cache2 = win;
+				cache2
 			}
 		}
 
@@ -53,8 +50,40 @@ public class SelectFillerAndIO {
 			System.out.println("ADapted misfits:" + f[0] +" "+ f[1] +" "+ f[2]+" " + f[3]);
 		}
 		return cache;
-	}
+	}*/
+	
+/**
+ * Comparison based on it disregarding .-
+ * @param adaptedCands
+ * @return
+ */
+	public Float[] getBest(Set<Float[]> adaptedCands){
+		
+		Float[] cache = { 0f, 0f, 0f, -1f };
+		Float[] cache2 = { 0f, 0f, 0f, -1f };
+		for (Float[] win : adaptedCands) {
+			if (win[3].intValue() >= (cache2[3].intValue())) {
+				cache2 = win;
+			}
+		}
 
+		cache[0] = cache2[0];
+		cache[1] = cache2[1];
+		cache[2] = cache2[2];
+		cache[3] = cache2[3];
+
+		if (cache[3] == 0)System.err.println("Best Bs "+adaptedCands.size());// throw new Exception("BEst is bullshit");
+		return cache;
+	}
+	public Float[] getBestRef(Set<Float[]> adaptedCands){
+		Float[] cache2 = { 0f, 0f, 0f, -1f };
+		for (Float[] win : adaptedCands) {
+			if (win[3].intValue() >= (cache2[3].intValue())) {
+				cache2 = win;
+			}
+		}
+		return cache2;
+	}
 	/**
 	 * 
 	 * @param winners

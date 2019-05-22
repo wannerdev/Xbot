@@ -111,16 +111,16 @@ public class Select {
 					boolean contains =false;
 					for (Float[] cand : adaptedCands) {
 						if((
-						cand[0].floatValue()==winner[0].floatValue()&&
-						cand[1].floatValue()==winner[1].floatValue()&&
-						cand[2].floatValue()==winner[2].floatValue()&&
-						cand[3].floatValue()==winner[3].floatValue()
+						cand[0].equals(winner[0])&&
+						cand[1].equals(winner[1])&&
+						cand[2].equals(winner[2])
+						//cand[3].floatValue()==winner[3].floatValue()
 						)){
 							contains = true;
 						}
 					}
 					if(!contains) {
-						adaptedCands.add(winner); // add the real winners (adapted+)
+						adaptedCands.add(winner); // add the real winner
 					}/*System.out.println("add result:"+);
 					 * 
 					 * for (Float[] f : adaptedCands) { System.out.println("# " + f[0] + " " + f[1]
@@ -165,6 +165,7 @@ public class Select {
 						// Range ist um den wert herum maximal einfach +- 0.2
 						if (candi[3] >= 0.5f) {// If winner (all should be winners except default)
 							for (int j = 0; j < 3; j++) { // mutate the weights
+								//TODO change less depending on quality
 								mutated[j] = (float) ((float) candi[j] + ((0.01) * Math.random() - 0.01 * Math.random()));
 								// respect 1 as maximum and 0 as minimum
 								if (mutated[j] < 0) {
@@ -178,10 +179,23 @@ public class Select {
 							candidates.add(mutated); // add mutated winners to candidates
 						}
 					}
-					Float[] best = fill.getBest(adaptedCands);
+					System.out.println("Adapted cands"+adaptedCands.size());
+					for (Float[] f : adaptedCands) {
+						System.out.println("ADapted misfits:" + f[0] +" "+ f[1] +" "+ f[2]+" " + f[3]);
+					}
+					Float[] best = fill.getBestRef(adaptedCands);
+					if(adaptedCands.remove(best)==false) {
+						System.err.println("fuck");
+					};
+					Float[] best2 = fill.getBestRef(adaptedCands);
+					adaptedCands.remove(best2);
+					Float[] best3 = fill.getBestRef(adaptedCands);
+					adaptedCands.remove(best3);
 					adaptedCands.removeAll(adaptedCands); //clean winners for new ones.
 					weights = best;
 					adaptedCands.add(best); // Add Best rated Parent 
+					adaptedCands.add(best2); 
+					adaptedCands.add(best3); 
 					// candidates.add(adaptedCands);
 					candidates = fill.fillInUntilFull(candidates);
 					fill.save(weights);
